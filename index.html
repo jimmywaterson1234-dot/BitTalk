@@ -1,33 +1,33 @@
-<script type="module" src="script.js"></script>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitTalk Pro Max | Global Messenger</title>
+    <title>BitTalk Elite v.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --accent: #a855f7; --bg: #0b0514; --glass: rgba(25, 12, 44, 0.8); }
-        body { background: var(--bg); color: #e9d5ff; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; }
+        :root { --accent: #a855f7; --bg: #0d0617; --glass: rgba(20, 10, 35, 0.85); }
+        body { background: var(--bg); color: #e9d5ff; font-family: 'Inter', sans-serif; overflow: hidden; }
         .violet-glass { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(168, 85, 247, 0.2); }
-        .btn-click:active { transform: scale(0.96); }
+        .btn-click:active { transform: scale(0.95); }
         .hidden { display: none !important; }
         
-        /* Статусы онлайн */
-        .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg); position: absolute; bottom: 0; right: 0; }
-        
-        /* Сообщения */
-        .msg-bubble { max-width: 85%; padding: 10px 14px; border-radius: 20px; position: relative; animation: slideUp 0.2s ease-out; }
-        .msg-mine { background: linear-gradient(135deg, #9333ea, #7e22ce); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg-other { background: #2d1b4d; align-self: flex-start; border-bottom-left-radius: 4px; }
-        
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Видео-кружок */
+        .video-circle { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); background: #000; }
+        .msg-video { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; }
+        .msg-img { max-width: 250px; border-radius: 15px; border: 1px solid rgba(168, 85, 247, 0.3); }
 
-        /* Адаптив */
+        /* Сообщения */
+        .msg-bubble { max-width: 80%; padding: 12px; border-radius: 18px; position: relative; animation: msgFade 0.3s ease; }
+        .msg-mine { background: linear-gradient(135deg, #9333ea, #6b21a8); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-other { background: #1e1135; align-self: flex-start; border-bottom-left-radius: 4px; }
+        @keyframes msgFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Адаптив мобилки */
         @media (max-width: 768px) {
-            #side-panel { width: 100%; height: 100%; position: absolute; z-index: 20; transition: 0.3s; }
-            #chat-window { width: 100%; height: 100%; position: absolute; z-index: 10; }
-            #side-panel.shifted { transform: translateX(-100%); }
+            #side-panel { width: 100%; position: absolute; z-index: 20; transition: 0.3s; }
+            #chat-window { width: 100%; position: absolute; z-index: 10; }
+            .side-hidden { transform: translateX(-100%); }
         }
     </style>
 </head>
@@ -35,99 +35,73 @@
 
 <div id="app" class="h-screen w-full flex overflow-hidden">
     
-    <div id="auth-screen" class="fixed inset-0 z-[100] bg-[#0b0514] flex items-center justify-center p-4">
-        <div class="violet-glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-2xl shadow-purple-900/40">
-            <div class="w-20 h-20 bg-purple-600 rounded-[28px] mx-auto mb-6 flex items-center justify-center shadow-lg shadow-purple-600/30">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-            <h1 class="text-3xl font-black mb-2 italic">BitTalk</h1>
-            <p class="text-purple-400 text-xs mb-8 uppercase tracking-widest font-bold">Next-Gen Messaging</p>
-            
-            <div class="space-y-3">
-                <input id="auth-login" type="text" placeholder="@username" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500 transition-all text-sm">
-                <input id="auth-pass" type="password" placeholder="Password" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500 transition-all text-sm">
-                <button id="auth-btn" class="w-full py-4 bg-purple-600 rounded-2xl font-bold btn-click shadow-lg shadow-purple-600/40">Войти / Создать</button>
-            </div>
-            <p id="auth-info" class="mt-4 text-[10px] text-purple-300/50 uppercase">v.5.0 Stable Release</p>
+    <div id="auth-screen" class="fixed inset-0 z-[100] bg-[#0d0617] flex items-center justify-center p-4">
+        <div class="violet-glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-2xl">
+            <div class="w-16 h-16 bg-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">BT</div>
+            <h1 class="text-2xl font-black mb-6">BitTalk Elite</h1>
+            <input id="auth-login" type="text" placeholder="@username" class="w-full p-4 mb-3 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500">
+            <input id="auth-pass" type="password" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500">
+            <button id="auth-btn" class="w-full py-4 bg-purple-600 rounded-2xl font-bold btn-click">Войти / Регистрация</button>
         </div>
     </div>
 
-    <div id="side-panel" class="w-full md:w-[380px] border-r border-purple-900/30 flex flex-col violet-glass transition-all">
+    <div id="side-panel" class="w-full md:w-[350px] border-r border-purple-900/30 flex flex-col violet-glass">
         <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black tracking-tighter italic">BitTalk</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold italic">Чаты</h2>
                 <div class="flex gap-2">
-                    <button id="create-group" class="p-2 bg-purple-900/40 rounded-xl btn-click text-sm" title="Создать группу">👥</button>
-                    <button id="open-settings" class="p-2 bg-purple-900/40 rounded-xl btn-click">⚙️</button>
+                    <button id="btn-group" class="p-2 bg-purple-900/40 rounded-xl" title="Группа">👥</button>
+                    <button id="btn-settings" class="p-2 bg-purple-900/40 rounded-xl">⚙️</button>
                 </div>
             </div>
-            <div class="relative">
-                <input id="user-search" type="text" placeholder="Поиск контактов..." class="w-full p-3 pl-10 rounded-xl bg-black/40 border border-purple-500/20 text-xs outline-none">
-                <span class="absolute left-3 top-3 opacity-30 text-sm">🔍</span>
-            </div>
+            <input id="search-input" type="text" placeholder="Поиск..." class="w-full p-3 rounded-xl bg-black/40 border border-purple-500/10 text-xs outline-none">
         </div>
-        <div id="chats-list" class="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
-            </div>
+        <div id="chats-list" class="flex-1 overflow-y-auto px-2 space-y-1"></div>
     </div>
 
-    <div id="chat-window" class="flex-1 flex flex-col relative bg-black/40">
-        <div class="p-4 violet-glass flex justify-between items-center z-10 shadow-lg">
+    <div id="chat-window" class="flex-1 flex flex-col bg-black/20">
+        <div id="chat-header" class="p-4 violet-glass flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3">
-                <button id="back-btn" class="md:hidden p-2">⬅️</button>
-                <div class="relative cursor-pointer" id="view-profile">
-                    <div id="header-avatar" class="w-10 h-10 bg-purple-600 rounded-[14px] flex items-center justify-center font-bold shadow-lg">?</div>
-                    <div id="header-online" class="online-dot hidden"></div>
-                </div>
+                <button id="back-btn" class="md:hidden">⬅️</button>
+                <div id="h-avatar" class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center font-bold shadow-lg">?</div>
                 <div>
-                    <h3 id="header-name" class="font-bold text-sm">Выберите чат</h3>
-                    <p id="header-status" class="text-[9px] text-purple-400 uppercase font-black tracking-widest">не в сети</p>
+                    <h3 id="h-name" class="font-bold text-sm">Выберите чат</h3>
+                    <p id="h-status" class="text-[9px] text-purple-400 uppercase tracking-tighter">офлайн</p>
                 </div>
             </div>
         </div>
 
-        <div id="messages-area" class="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
-            <div class="m-auto text-center opacity-20">
-                <svg class="w-20 h-20 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-                <p class="text-xs uppercase font-bold tracking-[0.2em]">Выберите диалог для общения</p>
-            </div>
-        </div>
+        <div id="msg-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3"></div>
 
-        <div class="p-4 bg-black/40 border-t border-purple-900/20">
-            <div class="max-w-3xl mx-auto flex items-end gap-2 bg-purple-950/20 p-2 rounded-[24px] border border-white/5">
-                <button id="media-btn" class="p-3 hover:bg-white/5 rounded-full btn-click text-xl">📁</button>
-                <textarea id="msg-input" rows="1" placeholder="Ваше сообщение..." class="flex-1 bg-transparent p-3 outline-none resize-none text-sm"></textarea>
-                <button id="send-btn" class="p-4 bg-purple-600 rounded-2xl btn-click shadow-lg shadow-purple-600/40 transition-all">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <div id="input-zone" class="p-4 bg-black/40 border-t border-purple-900/20">
+            <div id="media-preview" class="hidden mb-2 text-center">
+                <video id="vid-preview" class="video-circle mx-auto" autoplay muted playsinline></video>
+                <p class="text-[10px] text-red-500 animate-pulse mt-1">ИДЕТ ЗАПИСЬ...</p>
+            </div>
+            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-white/5 p-2 rounded-[22px]">
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+                <button id="btn-attach" class="p-3 text-xl btn-click">📎</button>
+                <textarea id="msg-input" rows="1" placeholder="Сообщение..." class="flex-1 bg-transparent p-3 outline-none resize-none text-sm"></textarea>
+                <button id="btn-mic" class="p-3 text-xl btn-click">🎤</button>
+                <button id="btn-cam" class="p-3 text-xl btn-click">🎥</button>
+                <button id="btn-send" class="p-4 bg-purple-600 rounded-xl btn-click shadow-lg">
+                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="settings-modal" class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl hidden flex items-center justify-center p-4">
-        <div class="violet-glass w-full max-w-md rounded-[40px] p-8 flex flex-col gap-6 shadow-[0_0_80px_rgba(168,85,247,0.3)]">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xl font-bold italic">Профиль</h3>
-                <button id="close-settings" class="p-2 bg-white/5 rounded-full">✕</button>
-            </div>
-            <div class="space-y-4">
-                <div class="text-center">
-                    <div id="settings-avatar" class="w-20 h-20 bg-purple-600 rounded-[24px] mx-auto flex items-center justify-center text-3xl font-black mb-4">?</div>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-bold text-purple-400 ml-2 tracking-widest">Ваше имя</label>
-                    <input id="edit-name" type="text" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500">
-                </div>
-                <button id="save-profile" class="w-full py-4 bg-purple-600 rounded-2xl font-bold btn-click">Сохранить</button>
-                <hr class="border-purple-900/40">
-                <button id="logout-btn" class="w-full py-2 text-red-400 text-xs font-bold uppercase tracking-widest">Выйти из аккаунта</button>
-            </div>
+    <div id="modal-overlay" class="fixed inset-0 z-[150] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div id="modal-content" class="violet-glass w-full max-w-md rounded-[35px] p-6 shadow-2xl relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-xl">✕</button>
+            <div id="modal-body"></div>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, onValue, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, onValue, set, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCaCtnz5ZJPJtq04Xm24dw5xc7QPZUHue",
@@ -139,70 +113,82 @@
         appId: "1:1083926758846:web:51032b148e48556bca25ef"
     };
 
-    const fb = initializeApp(firebaseConfig);
-    const db = getDatabase(fb);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
     
-    let user = JSON.parse(localStorage.getItem('bt_pmax_user')) || null;
-    let activeChatId = null;
-    let currentRoomId = null;
-    let chatListeners = [];
+    let user = JSON.parse(localStorage.getItem('bt_v6_user')) || null;
+    let activeChat = null;
+    let currentRoom = null;
+    let mediaRec = null;
+    let chunks = [];
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
+    // --- INIT ---
     function init() {
-        if (user) {
+        if(user) {
             document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('edit-name').value = user.name;
-            document.getElementById('settings-avatar').innerText = user.name[0];
-            updateOnlineStatus(true);
-            renderChatsList();
+            updateOnline(true);
+            renderChats();
         }
     }
 
-    // --- АВТОРИЗАЦИЯ ---
-    document.getElementById('auth-btn').addEventListener('click', () => {
-        const login = document.getElementById('auth-login').value.trim().replace('@', '');
-        const pass = document.getElementById('auth-pass').value.trim();
-        if(!login || !pass) return alert("Введите данные");
-
-        onValue(ref(db, `users/${login}`), (s) => {
-            const data = s.val();
-            if (data) {
-                if(data.pass === pass) { user = data; proceedLogin(); }
-                else alert("Неверный пароль");
-            } else {
-                const newUser = { login, pass, name: login, avatar: '', lastSeen: serverTimestamp() };
-                set(ref(db, `users/${login}`), newUser);
-                user = newUser; proceedLogin();
-            }
-        }, { onlyOnce: true });
+    // --- DELEGATION & CLICKS ---
+    document.addEventListener('click', (e) => {
+        const id = e.target.id || e.target.closest('button')?.id;
+        
+        if(id === 'auth-btn') handleAuth();
+        if(id === 'btn-send') sendMessage();
+        if(id === 'btn-settings') showSettings();
+        if(id === 'btn-group') showCreateGroup();
+        if(id === 'close-modal') document.getElementById('modal-overlay').classList.add('hidden');
+        if(id === 'back-btn') document.getElementById('side-panel').classList.remove('side-hidden');
+        if(id === 'btn-attach') document.getElementById('file-input').click();
+        if(id === 'btn-mic') startRecord('audio');
+        if(id === 'btn-cam') startRecord('video');
+        if(e.target.closest('#chat-header')) showProfile(activeChat);
     });
 
-    function proceedLogin() {
-        localStorage.setItem('bt_pmax_user', JSON.stringify(user));
+    // --- AUTH ---
+    function handleAuth() {
+        const login = document.getElementById('auth-login').value.trim().replace('@','');
+        const pass = document.getElementById('auth-pass').value.trim();
+        if(!login || !pass) return;
+
+        onValue(ref(db, `users/${login}`), (s) => {
+            if(s.exists()) {
+                const d = s.val();
+                if(d.pass === pass) loginUser(d);
+                else alert("Wrong pass");
+            } else {
+                const newUser = { login, pass, name: login, avatar: '', bio: 'Hi, I am new here!' };
+                set(ref(db, `users/${login}`), newUser);
+                loginUser(newUser);
+            }
+        }, {onlyOnce: true});
+    }
+
+    function loginUser(u) {
+        localStorage.setItem('bt_v6_user', JSON.stringify(u));
         location.reload();
     }
 
-    // --- СПИСОК ЧАТОВ ---
-    function renderChatsList() {
+    // --- CHATS & MESSAGES ---
+    function renderChats() {
         onValue(ref(db, 'users'), (s) => {
             const list = document.getElementById('chats-list');
             list.innerHTML = '';
             const users = s.val();
-            for (let id in users) {
-                if (id === user.login) continue;
+            for(let id in users) {
+                if(id === user.login) continue;
                 const u = users[id];
                 const div = document.createElement('div');
-                div.className = "flex items-center gap-4 p-4 rounded-2xl cursor-pointer hover:bg-purple-600/10 transition-all border border-transparent hover:border-purple-500/20";
+                div.className = "flex items-center gap-3 p-4 rounded-2xl cursor-pointer hover:bg-purple-500/10 transition-all";
                 div.innerHTML = `
                     <div class="relative">
-                        <div class="w-12 h-12 bg-purple-600 rounded-[16px] flex items-center justify-center font-bold shadow-lg">${u.name[0]}</div>
-                        ${u.isOnline ? '<div class="online-dot"></div>' : ''}
+                        <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center font-bold">${u.name[0]}</div>
+                        ${u.isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>' : ''}
                     </div>
-                    <div class="flex-1 overflow-hidden">
-                        <div class="flex justify-between items-baseline">
-                            <span class="font-bold text-sm">@${id}</span>
-                            <span class="text-[9px] opacity-40">${u.isOnline ? 'online' : 'off'}</span>
-                        </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-sm">@${id}</span></div>
                         <p class="text-[10px] text-purple-400 truncate">${u.name}</p>
                     </div>
                 `;
@@ -212,96 +198,153 @@
         });
     }
 
-    // --- ОТКРЫТИЕ ЧАТА ---
-    function openChat(targetId, targetName) {
-        activeChatId = targetId;
-        currentRoomId = [user.login, targetId].sort().join('_');
-        
-        document.getElementById('header-name').innerText = `@${targetId}`;
-        document.getElementById('header-avatar').innerText = targetId[0].toUpperCase();
-        document.getElementById('messages-area').innerHTML = '';
-        
-        if(window.innerWidth < 768) {
-            document.getElementById('side-panel').classList.add('shifted');
-        }
+    function openChat(id, name) {
+        activeChat = id;
+        currentRoom = [user.login, id].sort().join('_');
+        document.getElementById('h-name').innerText = `@${id}`;
+        document.getElementById('h-avatar').innerText = id[0].toUpperCase();
+        document.getElementById('msg-area').innerHTML = '';
+        if(window.innerWidth < 768) document.getElementById('side-panel').classList.add('side-hidden');
 
-        // Слушаем сообщения в этой комнате
-        const roomRef = ref(db, `rooms/${currentRoomId}`);
-        onChildAdded(roomRef, (s) => {
-            renderMessage(s.val());
-        });
+        onChildAdded(ref(db, `rooms/${currentRoom}`), (s) => renderMsg(s.val()));
     }
 
-    function renderMessage(msg) {
-        const area = document.getElementById('messages-area');
+    function sendMessage(content = null, type = 'text') {
+        const input = document.getElementById('msg-input');
+        const text = content || input.value.trim();
+        if(!text || !currentRoom) return;
+
+        push(ref(db, `rooms/${currentRoom}`), {
+            sender: user.login,
+            text: text,
+            type: type,
+            time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+        });
+        input.value = '';
+    }
+
+    function renderMsg(msg) {
+        const area = document.getElementById('msg-area');
         const isMine = msg.sender === user.login;
-        
         const div = document.createElement('div');
         div.className = `msg-bubble ${isMine ? 'msg-mine' : 'msg-other'}`;
-        div.innerHTML = `
-            <p class="text-sm leading-relaxed">${msg.text}</p>
-            <div class="flex items-center justify-end gap-1 mt-1">
-                <span class="text-[8px] opacity-60">${msg.time}</span>
-                ${isMine ? '<span class="text-[10px]">✓✓</span>' : ''}
-            </div>
-        `;
+        
+        if(msg.type === 'video') div.innerHTML = `<video src="${msg.text}" class="msg-video" controls></video>`;
+        else if(msg.type === 'img') div.innerHTML = `<img src="${msg.text}" class="msg-img">`;
+        else if(msg.type === 'audio') div.innerHTML = `<audio src="${msg.text}" controls class="w-48"></audio>`;
+        else div.innerHTML = `<p class="text-sm">${msg.text}</p>`;
+
+        div.innerHTML += `<span class="text-[8px] opacity-40 block text-right mt-1">${msg.time} ✓✓</span>`;
         area.appendChild(div);
         area.scrollTop = area.scrollHeight;
     }
 
-    // --- ОТПРАВКА ---
-    document.getElementById('send-btn').addEventListener('click', () => {
-        const input = document.getElementById('msg-input');
-        if (!input.value.trim() || !currentRoomId) return;
-
-        const msgData = {
-            sender: user.login,
-            text: input.value.trim(),
-            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            timestamp: serverTimestamp()
-        };
-
-        push(ref(db, `rooms/${currentRoomId}`), msgData);
-        input.value = '';
-        input.style.height = 'auto';
-    });
-
-    // --- ФУНКЦИИ ИНТЕРФЕЙСА ---
-    document.getElementById('back-btn').onclick = () => document.getElementById('side-panel').classList.remove('shifted');
-    document.getElementById('open-settings').onclick = () => document.getElementById('settings-modal').classList.remove('hidden');
-    document.getElementById('close-settings').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
-    
-    document.getElementById('save-profile').onclick = () => {
-        const name = document.getElementById('edit-name').value.trim();
-        if(!name) return;
-        user.name = name;
-        update(ref(db, `users/${user.login}`), { name: name });
-        localStorage.setItem('bt_pmax_user', JSON.stringify(user));
-        alert("Профиль сохранен!");
+    // --- PHOTO ATTACH ---
+    document.getElementById('file-input').onchange = function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => sendMessage(ev.target.result, 'img');
+        reader.readAsDataURL(file);
     };
 
-    document.getElementById('logout-btn').onclick = () => {
-        updateOnlineStatus(false);
-        localStorage.clear();
-        location.reload();
-    };
-
-    function updateOnlineStatus(status) {
-        if(!user) return;
-        update(ref(db, `users/${user.login}`), { isOnline: status, lastSeen: serverTimestamp() });
+    // --- MEDIA RECORD (VOICE/VIDEO) ---
+    async function startRecord(type) {
+        if(mediaRec && mediaRec.state === "recording") {
+            mediaRec.stop();
+            document.getElementById('media-preview').classList.add('hidden');
+            return;
+        }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: type === 'video'});
+            if(type === 'video') {
+                const pre = document.getElementById('vid-preview');
+                pre.srcObject = stream;
+                document.getElementById('media-preview').classList.remove('hidden');
+            }
+            mediaRec = new MediaRecorder(stream);
+            chunks = [];
+            mediaRec.ondataavailable = e => chunks.push(e.data);
+            mediaRec.onstop = () => {
+                const blob = new Blob(chunks, {type: type === 'video' ? 'video/webm' : 'audio/ogg'});
+                const r = new FileReader();
+                r.onload = (e) => sendMessage(e.target.result, type);
+                r.readAsDataURL(blob);
+                stream.getTracks().forEach(t => t.stop());
+            };
+            mediaRec.start();
+        } catch(e) { alert("Access denied"); }
     }
 
-    // Авто-высота textarea
-    document.getElementById('msg-input').oninput = function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+    // --- MODALS CONTENT ---
+    function showSettings() {
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `
+            <h2 class="text-xl font-bold mb-4">Настройки</h2>
+            <div class="space-y-4">
+                <input id="set-name" type="text" value="${user.name}" class="w-full p-4 rounded-xl bg-black/40 border border-purple-500/20">
+                <input id="set-bio" type="text" value="${user.bio || ''}" placeholder="О себе" class="w-full p-4 rounded-xl bg-black/40 border border-purple-500/20">
+                <button onclick="window.saveSet()" class="w-full py-4 bg-purple-600 rounded-xl font-bold">Сохранить</button>
+                <button onclick="window.showSigma()" class="w-full py-2 text-amber-500 text-xs font-black">⚡ SIGMA PANEL</button>
+                <button onclick="localStorage.clear(); location.reload();" class="w-full text-red-500 text-xs mt-4">ВЫЙТИ</button>
+            </div>
+        `;
+        document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    window.saveSet = () => {
+        const n = document.getElementById('set-name').value;
+        const b = document.getElementById('set-bio').value;
+        user.name = n; user.bio = b;
+        update(ref(db, `users/${user.login}`), {name: n, bio: b});
+        localStorage.setItem('bt_v6_user', JSON.stringify(user));
+        alert("Saved!");
     };
 
-    // Чтобы пользователь "уходил в офлайн" при закрытии вкладки
-    window.addEventListener('beforeunload', () => updateOnlineStatus(false));
+    window.showSigma = () => {
+        const p = prompt("Enter Sigma Key:");
+        if(p !== "1234567891011121314151617181920") return alert("Denied");
+        onValue(ref(db, 'users'), (s) => {
+            const users = s.val();
+            let html = '<h3 class="text-amber-500 font-bold mb-2">Manage Accounts</h3>';
+            for(let id in users) {
+                html += `<div class="flex justify-between mb-1 text-xs bg-black/20 p-2 rounded">
+                    <span>@${id}</span>
+                    <button onclick="window.delUser('${id}')" class="text-red-500">DEL</button>
+                </div>`;
+            }
+            document.getElementById('modal-body').innerHTML = html;
+        });
+    };
 
+    window.delUser = (id) => { if(confirm(`Удалить ${id}?`)) remove(ref(db, `users/${id}`)); };
+
+    function showProfile(id) {
+        if(!id) return;
+        onValue(ref(db, `users/${id}`), (s) => {
+            const u = s.val();
+            document.getElementById('modal-body').innerHTML = `
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-purple-600 rounded-[30px] mx-auto mb-4 flex items-center justify-center text-4xl font-bold">${u.name[0]}</div>
+                    <h2 class="text-2xl font-bold">@${id}</h2>
+                    <p class="text-purple-400 mb-4">${u.name}</p>
+                    <div class="bg-black/20 p-4 rounded-2xl text-sm italic text-left">
+                        "${u.bio || 'Нет информации'}"
+                    </div>
+                    <button onclick="document.getElementById('modal-overlay').classList.add('hidden')" class="mt-6 w-full py-3 bg-white/5 rounded-xl">Закрыть</button>
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }, {onlyOnce: true});
+    }
+
+    function updateOnline(st) {
+        if(user) update(ref(db, `users/${user.login}`), {isOnline: st});
+    }
+
+    window.addEventListener('beforeunload', () => updateOnline(false));
     init();
 </script>
 </body>
-                </html>
-                
+    </html>
+        
