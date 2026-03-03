@@ -4,23 +4,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitTalk Test</title>
+    <title>BitTalk | Unique Messenger</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #6366f1;
+            --text: #f8fafc;
+        }
+        body { background-color: var(--bg-main); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .avatar-capsule { border-radius: 12px; width: 45px; height: 45px; object-fit: cover; }
+        .msg-appear { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <div id="app" class="max-w-md mx-auto h-screen flex flex-col p-4">
-        <h1 class="text-2xl font-bold mb-4">BitTalk Loading...</h1>
-        <div id="messages" class="flex-1 border border-gray-700 mb-4 p-2 overflow-y-auto text-sm">
+<body>
+
+<div id="auth-screen" class="h-screen w-full flex items-center justify-center p-6">
+    <div class="glass p-8 rounded-3xl w-full max-w-sm text-center shadow-2xl">
+        <div class="mb-6 inline-block p-4 bg-indigo-500 rounded-2xl shadow-lg shadow-indigo-500/50">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">BitTalk</h2>
+        <p class="text-gray-400 text-sm mb-6">Введите данные для входа</p>
+        
+        <input id="login-input" type="text" placeholder="Логин" class="w-full mb-3 p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-indigo-500 transition-all">
+        <input id="pass-input" type="password" placeholder="Пароль" class="w-full mb-3 p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-indigo-500 transition-all">
+        
+        <p id="auth-error" class="text-red-400 text-xs mb-3 hidden">Нет такого аккаунта</p>
+        
+        <button id="auth-btn" class="w-full py-3 bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all active:scale-95 shadow-lg shadow-indigo-600/30">Войти</button>
+        <button id="reg-btn" class="w-full mt-2 py-3 border border-indigo-600/50 rounded-xl font-bold text-indigo-400 hover:bg-indigo-600/10 transition-all hidden">Зарегистрироваться</button>
+    </div>
+</div>
+
+<div id="main-app" class="h-screen flex hidden overflow-hidden">
+    <div id="sidebar" class="w-full md:w-80 flex-shrink-0 border-r border-slate-800 flex flex-col glass">
+        <div class="p-4 flex justify-between items-center border-b border-slate-800">
+            <span class="font-bold text-xl tracking-tight text-indigo-400">BitTalk</span>
+            <button id="open-settings" class="p-2 hover:bg-slate-700 rounded-lg transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto" id="chats-list">
+            <div class="p-4 flex items-center gap-3 cursor-pointer hover:bg-indigo-600/20 transition-all border-l-4 border-indigo-500 bg-indigo-600/10">
+                <div class="bg-indigo-500 avatar-capsule flex items-center justify-center font-bold">G</div>
+                <div class="flex-1 overflow-hidden">
+                    <div class="flex justify-between"><span class="font-medium">Общий чат</span><span class="text-[10px] text-gray-500">online</span></div>
+                    <p class="text-xs text-gray-400 truncate">Добро пожаловать в BitTalk!</p>
+                </div>
             </div>
-        <div class="flex gap-2">
-            <input id="messageInput" class="flex-1 bg-gray-800 p-2 rounded" placeholder="Текст...">
-            <button id="sendBtn" class="bg-blue-600 px-4 rounded">OK</button>
         </div>
     </div>
 
-    <script type="module">
-        console.log("HTML загружен");
-        import './script.js';
-    </script>
+    <div id="chat-window" class="flex-1 flex flex-col relative bg-slate-900/50">
+        <div id="chat-header" class="p-4 glass flex items-center gap-3 md:block">
+            <button id="back-to-list" class="md:hidden mr-2">←</button>
+            <span class="font-bold">Общий чат</span>
+        </div>
+        
+        <div id="messages-area" class="flex-1 overflow-y-auto p-4 space-y-4">
+            </div>
+
+        <div class="p-4 bg-slate-900">
+            <div class="max-w-4xl mx-auto flex gap-2 items-center glass p-2 rounded-2xl">
+                <input id="msg-input" type="text" placeholder="Ваше сообщение..." class="flex-1 bg-transparent p-2 outline-none text-sm">
+                <button id="send-btn" class="p-3 bg-indigo-600 rounded-xl hover:bg-indigo-500 active:scale-90 transition-all">
+                    <svg class="w-5 h-5 rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="glass w-full max-w-lg rounded-3xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between">
+            <h3 class="font-bold">Настройки</h3>
+            <button id="close-settings" class="text-gray-400">✕</button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1 space-y-4">
+            <div class="flex items-center gap-4 p-4 bg-slate-800/50 rounded-2xl">
+                <div id="user-avatar" class="w-16 h-16 bg-indigo-500 avatar-capsule flex items-center justify-center text-2xl font-bold">?</div>
+                <div>
+                    <p class="text-sm text-gray-400">Ваш ник:</p>
+                    <p id="display-name" class="font-bold text-lg">User</p>
+                </div>
+            </div>
+            
+            <button id="sigma-panel-btn" class="w-full p-4 bg-amber-500/20 text-amber-500 border border-amber-500/30 rounded-2xl font-bold hover:bg-amber-500/30 transition-all">⚡ Сигма панель (Admin)</button>
+            
+            <div id="sigma-area" class="hidden space-y-3 mt-4 animate-in fade-in duration-500">
+                <h4 class="text-amber-500 font-bold border-b border-amber-500/20 pb-2">Управление аккаунтами</h4>
+                <div id="users-list" class="space-y-2">
+                    </div>
+            </div>
+
+            <button id="logout-btn" class="w-full p-4 bg-red-500/10 text-red-500 rounded-2xl text-sm font-medium">Выйти из аккаунта</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // ИНИЦИАЛИЗАЦИЯ FIREBASE (Твой конфиг)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCaCtnz5ZJPJtq04Xm24dw5xc7QPZUHue",
+        authDomain: "bittalk-e6df4.firebaseapp.com",
+        databaseURL: "https://bittalk-e6df4-default-rtdb.firebaseio.com",
+        projectId: "bittalk-e6df4",
+        storageBucket: "bittalk-e6df4.firebasestorage.app",
+        messagingSenderId: "1083926758846",
+        appId: "1:1083926758846:web:51032b148e48556bca25ef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const msgRef = ref(db, 'messages_v2'); // Новая ветка для нового дизайна
+
+    // СОСТОЯНИЕ (LOCALSTORAGE)
+    let currentUser = JSON.parse(localStorage.getItem('bt_user')) || null;
+    let allUsers = JSON.parse(localStorage.getItem('bt_users_db')) || [];
+
+    const authScreen = document.getElementById('auth-screen');
+    const mainApp = document.getElementById('main-app');
+    const authError = document.getElementById('auth-error');
+    const regBtn = document.getElementById('reg-btn');
+
+    // ЛОГИКА АВТОРИЗАЦИИ
+    function checkAuth() {
+        if (currentUser) {
+            authScreen.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            document.getElementById('display-name').innerText = currentUser.login;
+            document.getElementById('user-avatar').innerText = currentUser.login[0].toUpperCase();
+        } else {
+            authScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+        }
+    }
+
+    document.getElementById('auth-btn').onclick = () => {
+        const login = document.getElementById('login-input').value.trim();
+        const pass = document.getElementById('pass-input').value.trim();
+        
+        if (!login || !pass) return;
+
+        const user = allUsers.find(u => u.login === login);
+        
+        if (user) {
+            if (user.pass === pass) {
+                currentUser = user;
+                localStorage.setItem('bt_user', JSON.stringify(user));
+                checkAuth();
+            } else {
+                authError.innerText = "Неверный пароль!";
+                authError.classList.remove('hidden');
+            }
+        } else {
+            authError.innerText = "Аккаунт не найден";
+            authError.classList.remove('hidden');
+            regBtn.classList.remove('hidden');
+        }
+    };
+
+    regBtn.onclick = () => {
+        const login = document.getElementById('login-input').value.trim();
+        const pass = document.getElementById('pass-input').value.trim();
+        const newUser = { login, pass, id: Date.now() };
+        allUsers.push(newUser);
+        localStorage.setItem('bt_users_db', JSON.stringify(allUsers));
+        currentUser = newUser;
+        localStorage.setItem('bt_user', JSON.stringify(newUser));
+        checkAuth();
+    };
+
+    // ОТПРАВКА СООБЩЕНИЙ
+    document.getElementById('send-btn').onclick = sendMessage;
+    document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+
+    function sendMessage() {
+        const input = document.getElementById('msg-input');
+        if (!input.value.trim() || !currentUser) return;
+
+        push(msgRef, {
+            sender: currentUser.login,
+            text: input.value,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+        input.value = '';
+    }
+
+    // ПОЛУЧЕНИЕ СООБЩЕНИЙ
+    onChildAdded(msgRef, (data) => {
+        const val = data.val();
+        const area = document.getElementById('messages-area');
+        const isMine = val.sender === currentUser?.login;
+        
+        const msgHtml = `
+            <div class="flex ${isMine ? 'justify-end' : 'justify-start'} msg-appear">
+                <div class="${isMine ? 'bg-indigo-600 rounded-tr-none' : 'bg-slate-800 rounded-tl-none'} p-3 rounded-2xl max-w-[80%] shadow-lg">
+                    ${!isMine ? `<p class="text-[10px] font-bold text-indigo-400 mb-1">${val.sender}</p>` : ''}
+                    <p class="text-sm">${val.text}</p>
+                    <p class="text-[9px] opacity-50 text-right mt-1">${val.time}</p>
+                </div>
+            </div>
+        `;
+        area.insertAdjacentHTML('beforeend', msgHtml);
+        area.scrollTop = area.scrollHeight;
+    });
+
+    // НАСТРОЙКИ И СИГМА
+    document.getElementById('open-settings').onclick = () => {
+        document.getElementById('settings-modal').classList.remove('hidden');
+        renderSigmaList();
+    };
+    document.getElementById('close-settings').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
+    
+    document.getElementById('sigma-panel-btn').onclick = () => {
+        document.getElementById('sigma-area').classList.toggle('hidden');
+    };
+
+    function renderSigmaList() {
+        const list = document.getElementById('users-list');
+        list.innerHTML = '';
+        allUsers.forEach(user => {
+            list.innerHTML += `
+                <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-white/5">
+                    <span class="text-sm font-medium">${user.login}</span>
+                    <div class="flex gap-2">
+                        <button onclick="window.loginAs(${user.id})" class="text-[10px] bg-green-500/20 text-green-500 px-2 py-1 rounded">Войти</button>
+                        <button onclick="window.deleteUser(${user.id})" class="text-[10px] bg-red-500/20 text-red-500 px-2 py-1 rounded">Удалить</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.loginAs = (id) => {
+        const user = allUsers.find(u => u.id === id);
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('bt_user', JSON.stringify(user));
+            location.reload();
+        }
+    };
+
+    window.deleteUser = (id) => {
+        allUsers = allUsers.filter(u => u.id !== id);
+        localStorage.setItem('bt_users_db', JSON.stringify(allUsers));
+        renderSigmaList();
+    };
+
+    document.getElementById('logout-btn').onclick = () => {
+        localStorage.removeItem('bt_user');
+        location.reload();
+    };
+
+    // Мобильная навигация
+    document.getElementById('back-to-list').onclick = () => {
+        document.getElementById('sidebar').classList.remove('hidden');
+    };
+
+    checkAuth();
+</script>
 </body>
 </html>
