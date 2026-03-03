@@ -3,144 +3,117 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitTalk Pro | Violet Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BitTalk Ultimate | Private Messenger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg: #0a0a0c;
-            --card: #16161d;
-            --accent: #8b5cf6; /* Фиолетовый */
-            --text: #f1f1f1;
-        }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .violet-gradient { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
-        .glass { background: rgba(22, 22, 29, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(139, 92, 246, 0.2); }
-        .avatar-capsule { border-radius: 14px; width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--accent); }
+        :root { --accent: #a855f7; --bg: #0f071a; --glass: rgba(30, 15, 50, 0.7); }
+        body { background-color: var(--bg); color: #e9d5ff; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; touch-action: manipulation; }
+        .violet-glass { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .btn-active:active { transform: scale(0.95); }
         .hidden { display: none !important; }
-        .msg-mine { background: var(--accent); border-radius: 18px 18px 0 18px; align-self: flex-end; }
-        .msg-other { background: #26262e; border-radius: 18px 18px 18px 0; align-self: flex-start; }
-        #video-preview { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); display: none; }
-        .scroll-hide::-webkit-scrollbar { width: 4px; }
-        .scroll-hide::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        
+        /* Видео-кружки */
+        .video-circle { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); background: #000; }
+        .msg-video { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            #side-panel { width: 100%; position: absolute; z-index: 20; }
+            #chat-window { width: 100%; position: absolute; z-index: 10; }
+            #chat-window.active { z-index: 30; }
+        }
+
+        /* Анимация сообщений */
+        .msg-anim { animation: msgIn 0.3s ease-out forwards; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div id="auth-screen" class="h-screen w-full flex items-center justify-center p-4">
-    <div class="glass p-8 rounded-[32px] w-full max-w-sm shadow-2xl border-indigo-500/30">
-        <div class="text-center mb-8">
-            <div class="inline-block p-4 violet-gradient rounded-3xl shadow-lg shadow-purple-500/40 mb-4">
+<div id="app">
+    <div id="auth-screen" class="h-screen w-full flex items-center justify-center p-4">
+        <div class="violet-glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-[0_0_50px_rgba(168,85,247,0.2)]">
+            <div class="mb-6 inline-block p-5 bg-purple-600 rounded-[24px] shadow-lg">
                 <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <h1 class="text-3xl font-black tracking-tighter">BitTalk <span class="text-purple-500">PRO</span></h1>
-        </div>
-
-        <div id="auth-form" class="space-y-4">
-            <input id="auth-login" type="text" placeholder="Юзернейм (@username)" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500 transition-all">
-            <input id="auth-pass" type="password" placeholder="Пароль" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/20 outline-none focus:border-purple-500 transition-all">
-            <p id="auth-msg" class="text-red-400 text-xs text-center hidden"></p>
-            
-            <button id="login-btn" class="w-full py-4 violet-gradient rounded-2xl font-bold shadow-lg active:scale-95 transition-all">Войти</button>
-            <button id="reg-view-btn" class="w-full text-sm text-purple-400 font-medium">Нет аккаунта? Зарегистрироваться</button>
+            <h1 class="text-3xl font-black mb-6 tracking-tighter">BitTalk <span class="text-purple-400">V.4</span></h1>
+            <input id="auth-login" type="text" placeholder="@username" class="w-full mb-3 p-4 rounded-2xl bg-black/40 border border-purple-500/30 outline-none focus:border-purple-500 transition-all">
+            <input id="auth-pass" type="password" placeholder="Пароль" class="w-full mb-6 p-4 rounded-2xl bg-black/40 border border-purple-500/30 outline-none focus:border-purple-500 transition-all">
+            <button id="login-btn" class="w-full py-4 bg-purple-600 rounded-2xl font-bold btn-active shadow-lg shadow-purple-600/30">Войти / Регистрация</button>
+            <p id="auth-status" class="mt-4 text-xs text-purple-300 opacity-70"></p>
         </div>
     </div>
-</div>
 
-<div id="main-app" class="h-screen flex hidden overflow-hidden">
-    
-    <div id="side-panel" class="w-full md:w-96 flex-shrink-0 border-r border-purple-500/10 flex flex-col glass">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Чаты</h2>
-                <button id="settings-trigger" class="p-2 bg-purple-500/10 rounded-xl">
-                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                </button>
+    <div id="main-app" class="h-screen flex hidden">
+        <div id="side-panel" class="h-full border-r border-purple-900/30 flex flex-col violet-glass">
+            <div class="p-6 flex justify-between items-center">
+                <h2 class="text-2xl font-black text-purple-400">Чаты</h2>
+                <button id="open-settings" class="p-2 bg-purple-900/40 rounded-xl btn-active">⚙️</button>
             </div>
-            <div class="relative">
-                <input id="user-search" type="text" placeholder="Поиск по @юзернейму..." class="w-full p-3 pl-10 rounded-xl bg-black/20 border border-purple-500/20 text-sm outline-none focus:border-purple-500">
-                <svg class="w-4 h-4 absolute left-3 top-3.5 text-purple-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <div class="px-6 mb-4">
+                <input id="user-search" type="text" placeholder="Поиск @юзеров..." class="w-full p-3 rounded-xl bg-black/40 border border-purple-500/20 text-sm outline-none">
             </div>
+            <div id="chats-list" class="flex-1 overflow-y-auto px-2 space-y-1"></div>
         </div>
 
-        <div id="chats-list" class="flex-1 overflow-y-auto scroll-hide space-y-1 p-2">
-            </div>
-    </div>
-
-    <div id="chat-window" class="flex-1 flex flex-col bg-black/20">
-        <div class="p-4 glass flex justify-between items-center z-10">
-            <div class="flex items-center gap-3">
-                <button id="close-chat" class="md:hidden">←</button>
-                <div id="chat-avatar" class="w-10 h-10 violet-gradient rounded-xl flex items-center justify-center font-bold">?</div>
+        <div id="chat-window" class="h-full flex-1 flex flex-col bg-black/20 transition-all">
+            <div class="p-4 violet-glass flex items-center gap-4">
+                <button id="back-btn" class="md:hidden text-2xl">←</button>
+                <div id="chat-header-avatar" class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center font-bold">?</div>
                 <div>
-                    <h3 id="chat-with-name" class="font-bold leading-tight">Выберите чат</h3>
-                    <p id="chat-status" class="text-[10px] text-purple-400">последние сообщения</p>
+                    <h3 id="chat-title" class="font-bold">Выберите чат</h3>
+                    <p class="text-[10px] text-purple-400 uppercase tracking-widest">online</p>
                 </div>
             </div>
-        </div>
 
-        <div id="messages-display" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 scroll-hide">
-            <div class="text-center text-gray-500 text-xs mt-20">Здесь будет ваша переписка</div>
-        </div>
+            <div id="messages-area" class="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col"></div>
 
-        <div class="p-4 bg-black/40 border-t border-purple-500/10">
-            <div class="max-w-4xl mx-auto flex items-end gap-3 glass p-2 rounded-[24px]">
-                <button id="media-mode" class="p-3 text-purple-400 hover:bg-purple-500/10 rounded-full transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 18.75a6 6 0 100-12 6 6 0 000 12zM15 13.5a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </button>
-                <textarea id="msg-input" rows="1" placeholder="Сообщение..." class="flex-1 bg-transparent p-3 outline-none resize-none text-sm"></textarea>
-                <button id="send-msg" class="p-4 violet-gradient rounded-2xl shadow-lg active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
-                </button>
+            <div class="p-4 bg-black/40 border-t border-purple-900/20">
+                <div id="recording-status" class="hidden text-center text-red-500 text-xs mb-2 animate-pulse">● Идет запись...</div>
+                <div class="max-w-4xl mx-auto flex items-end gap-2">
+                    <div class="flex gap-1">
+                        <button id="voice-btn" class="p-3 bg-purple-900/40 rounded-full btn-active text-xl">🎤</button>
+                        <button id="video-btn" class="p-3 bg-purple-900/40 rounded-full btn-active text-xl">🎥</button>
+                    </div>
+                    <textarea id="msg-input" rows="1" placeholder="Сообщение..." class="flex-1 bg-white/5 p-3 rounded-2xl outline-none border border-purple-500/20 resize-none text-sm"></textarea>
+                    <button id="send-btn" class="p-4 bg-purple-600 rounded-2xl btn-active shadow-lg shadow-purple-600/30">
+                        <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+                <center><video id="record-preview" class="video-circle mt-4 hidden" autoplay muted playsinline></video></center>
             </div>
-            <video id="video-preview" autoplay muted playsinline class="mx-auto mt-2"></video>
         </div>
     </div>
-</div>
 
-<div id="settings-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center hidden p-4">
-    <div class="glass w-full max-w-lg rounded-[40px] overflow-hidden flex flex-col max-h-[90vh]">
-        <div class="p-6 border-b border-purple-500/20 flex justify-between items-center">
-            <h3 class="text-xl font-bold">Настройки профиля</h3>
-            <button id="close-settings" class="p-2 hover:bg-white/10 rounded-full">✕</button>
-        </div>
-        
-        <div class="p-8 overflow-y-auto scroll-hide space-y-6">
+    <div id="settings-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl hidden flex items-center justify-center p-4">
+        <div class="violet-glass w-full max-w-md rounded-[40px] p-8 flex flex-col gap-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold">Профиль</h3>
+                <button id="close-settings" class="text-2xl">✕</button>
+            </div>
             <div class="space-y-4">
-                <div class="flex items-center gap-6 mb-4">
-                    <div id="my-avatar" class="w-20 h-20 violet-gradient rounded-[24px] flex items-center justify-center text-3xl font-bold shadow-xl">U</div>
-                    <div class="flex-1">
-                        <label class="block text-xs text-purple-400 mb-1">Имя в системе</label>
-                        <input id="edit-name" type="text" class="w-full bg-white/5 p-2 rounded-lg outline-none border border-white/10 focus:border-purple-500">
-                    </div>
+                <input id="edit-name" type="text" placeholder="Ваше имя" class="w-full p-4 rounded-2xl bg-black/40 border border-purple-500/30 outline-none">
+                <button id="save-profile" class="w-full py-4 bg-purple-600 rounded-2xl font-bold btn-active">Сохранить</button>
+                <hr class="border-purple-900/50">
+                <button id="sigma-panel-btn" class="w-full py-4 border border-amber-500 text-amber-500 rounded-2xl font-black italic">⚡ SIGMA PANEL</button>
+                <div id="sigma-auth" class="hidden space-y-2">
+                    <input id="sigma-pass" type="password" placeholder="Master Key" class="w-full p-3 rounded-xl bg-red-900/20 border border-red-500 outline-none text-center">
+                    <button id="sigma-unlock" class="w-full py-2 bg-red-600 rounded-lg text-xs font-bold uppercase">Unlock Database</button>
                 </div>
-                <button id="save-profile" class="w-full py-3 bg-purple-600 rounded-xl text-sm font-bold">Сохранить изменения</button>
+                <div id="sigma-list" class="hidden max-h-40 overflow-y-auto space-y-2"></div>
+                <button id="logout-btn" class="w-full py-2 text-gray-500 text-xs">Выйти</button>
             </div>
-
-            <hr class="border-purple-500/20">
-
-            <button id="sigma-auth-trigger" class="w-full p-4 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-2xl font-black italic tracking-widest hover:bg-amber-500/20 transition-all">⚡ SIGMA PANEL ⚡</button>
-            
-            <div id="sigma-lock" class="hidden space-y-3 p-4 bg-black/40 rounded-2xl border border-red-500/20">
-                <p class="text-xs text-center text-red-400 uppercase font-bold">Введите мастер-пароль</p>
-                <input id="sigma-pass" type="password" class="w-full p-3 bg-black rounded-xl border border-red-500/30 outline-none text-center tracking-[1em]">
-                <button id="sigma-unlock-btn" class="w-full py-2 bg-red-600 rounded-lg text-xs font-bold">ACCESS GRANTED?</button>
-            </div>
-
-            <div id="sigma-content" class="hidden space-y-3">
-                <h4 class="text-amber-500 font-bold">Управление душами (Accounts)</h4>
-                <div id="sigma-users-list" class="space-y-2"></div>
-            </div>
-
-            <button id="logout-btn" class="w-full p-4 text-gray-500 text-xs hover:text-red-400 transition-colors">Выйти из системы</button>
         </div>
     </div>
 </div>
 
 <script type="module">
-    // --- FIREBASE SETUP ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCaCtnz5ZJPJtq04Xm24dw5xc7QPZUHue",
@@ -152,185 +125,206 @@
         appId: "1:1083926758846:web:51032b148e48556bca25ef"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const fb = initializeApp(firebaseConfig);
+    const db = getDatabase(fb);
+    
+    let user = JSON.parse(localStorage.getItem('bt_user')) || null;
+    let activeChat = null;
+    let mediaRecorder = null;
+    let chunks = [];
 
-    // --- STATE ---
-    let currentUser = JSON.parse(localStorage.getItem('bt_v3_user')) || null;
-    let selectedChat = null;
-    const SIGMA_KEY = "1234567891011121314151617181920";
-
-    // --- UI ELEMENTS ---
-    const screens = { auth: document.getElementById('auth-screen'), main: document.getElementById('main-app') };
-    const authMsg = document.getElementById('auth-msg');
-
-    // --- AUTH LOGIC ---
+    // --- ИНИЦИАЛИЗАЦИЯ ---
     function init() {
-        if (currentUser) {
-            screens.auth.classList.add('hidden');
-            screens.main.classList.remove('hidden');
-            loadChats();
-            syncProfileUI();
+        if (user) {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            renderChats();
         }
     }
 
-    document.getElementById('login-btn').onclick = async () => {
-        const login = document.getElementById('auth-login').value.trim();
-        const pass = document.getElementById('auth-pass').value.trim();
-        if (!login || !pass) return error("Заполните поля");
+    // --- ОБРАБОТЧИКИ СОБЫТИЙ (CLICK) ---
+    document.addEventListener('click', async (e) => {
+        const id = e.target.id;
 
-        onValue(ref(db, 'users/' + login), (snapshot) => {
-            const user = snapshot.val();
-            if (user && user.pass === pass) {
-                loginUser(user);
-            } else if (user) {
-                error("Неверный пароль");
+        if (id === 'login-btn') handleAuth();
+        if (id === 'send-btn') sendMsg();
+        if (id === 'back-btn') toggleMobileChat(false);
+        if (id === 'open-settings') document.getElementById('settings-modal').classList.remove('hidden');
+        if (id === 'close-settings') document.getElementById('settings-modal').classList.add('hidden');
+        if (id === 'save-profile') saveProfile();
+        if (id === 'logout-btn') { localStorage.clear(); location.reload(); }
+        if (id === 'sigma-panel-btn') document.getElementById('sigma-auth').classList.toggle('hidden');
+        if (id === 'sigma-unlock') handleSigma();
+        
+        // Медиа кнопки
+        if (id === 'voice-btn') startMediaRecord('audio');
+        if (id === 'video-btn') startMediaRecord('video');
+    });
+
+    // --- АВТОРИЗАЦИЯ ---
+    async function handleAuth() {
+        const login = document.getElementById('auth-login').value.trim().replace('@', '');
+        const pass = document.getElementById('auth-pass').value.trim();
+        if (!login || !pass) return;
+
+        onValue(ref(db, `users/${login}`), (s) => {
+            const data = s.val();
+            if (data) {
+                if (data.pass === pass) { user = data; proceedAuth(); }
+                else { alert("Неверный пароль"); }
             } else {
-                // Если юзера нет - предлагаем регистрацию через ту же кнопку
-                if (confirm("Аккаунт не найден. Создать новый?")) {
-                    const newUser = { login, pass, name: login, avatar: '' };
-                    set(ref(db, 'users/' + login), newUser);
-                    loginUser(newUser);
-                }
+                const newUser = { login, pass, name: login, avatar: '' };
+                set(ref(db, `users/${login}`), newUser);
+                user = newUser; proceedAuth();
             }
         }, { onlyOnce: true });
-    };
+    }
 
-    function loginUser(user) {
-        currentUser = user;
-        localStorage.setItem('bt_v3_user', JSON.stringify(user));
+    function proceedAuth() {
+        localStorage.setItem('bt_user', JSON.stringify(user));
         location.reload();
     }
 
-    function error(text) {
-        authMsg.innerText = text;
-        authMsg.classList.remove('hidden');
-    }
-
-    // --- CHATS & MESSAGES ---
-    function loadChats() {
-        onValue(ref(db, 'users'), (snapshot) => {
-            const users = snapshot.val();
+    // --- ЧАТЫ ---
+    function renderChats() {
+        onValue(ref(db, 'users'), (s) => {
             const list = document.getElementById('chats-list');
             list.innerHTML = '';
+            const users = s.val();
             for (let id in users) {
-                if (id === currentUser.login) continue;
+                if (id === user.login) continue;
                 const u = users[id];
-                list.innerHTML += `
-                    <div onclick="openChat('${id}')" class="p-4 flex items-center gap-3 cursor-pointer hover:bg-purple-500/10 rounded-2xl transition-all">
-                        <div class="w-12 h-12 violet-gradient rounded-xl flex items-center justify-center font-bold text-lg">${u.name[0]}</div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="flex justify-between items-baseline"><span class="font-bold">@${id}</span></div>
-                            <p class="text-xs text-gray-500 truncate">${u.name}</p>
-                        </div>
-                    </div>
-                `;
+                const div = document.createElement('div');
+                div.className = "p-4 flex items-center gap-3 cursor-pointer hover:bg-purple-500/10 rounded-2xl transition-all mb-1";
+                div.innerHTML = `<div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center font-bold">${u.name[0]}</div>
+                                 <div class="flex-1"><b>@${id}</b><p class="text-[10px] text-gray-500">${u.name}</p></div>`;
+                div.onclick = () => openChat(id, u.name);
+                list.appendChild(div);
             }
         });
     }
 
-    window.openChat = (userId) => {
-        selectedChat = userId;
-        document.getElementById('chat-with-name').innerText = "@" + userId;
-        document.getElementById('chat-avatar').innerText = userId[0].toUpperCase();
-        document.getElementById('messages-display').innerHTML = '';
-        
-        // Генерируем ID комнаты (всегда одинаковый для пары юзеров)
-        const roomId = [currentUser.login, userId].sort().join('_');
-        const roomRef = ref(db, 'rooms/' + roomId);
+    function openChat(targetId, targetName) {
+        activeChat = targetId;
+        document.getElementById('chat-title').innerText = `@${targetId}`;
+        document.getElementById('chat-header-avatar').innerText = targetId[0].toUpperCase();
+        document.getElementById('messages-area').innerHTML = '';
+        toggleMobileChat(true);
 
-        onChildAdded(roomRef, (data) => {
-            renderMessage(data.val());
+        const roomId = [user.login, targetId].sort().join('_');
+        onChildAdded(ref(db, `rooms/${roomId}`), (s) => {
+            renderMessage(s.val());
         });
-    };
+    }
+
+    function toggleMobileChat(show) {
+        if (show) document.getElementById('chat-window').classList.add('active');
+        else document.getElementById('chat-window').classList.remove('active');
+    }
+
+    // --- СООБЩЕНИЯ ---
+    function sendMsg(mediaData = null, type = 'text') {
+        const input = document.getElementById('msg-input');
+        if (!mediaData && !input.value.trim()) return;
+        if (!activeChat) return alert("Выберите чат");
+
+        const roomId = [user.login, activeChat].sort().join('_');
+        push(ref(db, `rooms/${roomId}`), {
+            sender: user.login,
+            text: mediaData || input.value,
+            type: type,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+        input.value = '';
+        document.getElementById('record-preview').classList.add('hidden');
+    }
 
     function renderMessage(msg) {
-        const area = document.getElementById('messages-display');
-        const isMine = msg.sender === currentUser.login;
-        const html = `
-            <div class="flex ${isMine ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div class="${isMine ? 'msg-mine' : 'msg-other'} p-3 px-4 shadow-xl max-w-[75%]">
-                    <p class="text-sm leading-relaxed">${msg.text}</p>
-                    <span class="text-[9px] opacity-40 block text-right mt-1">${msg.time}</span>
-                </div>
-            </div>
-        `;
-        area.insertAdjacentHTML('beforeend', html);
+        const area = document.getElementById('messages-area');
+        const isMine = msg.sender === user.login;
+        const div = document.createElement('div');
+        div.className = `max-w-[80%] p-3 rounded-2xl msg-anim ${isMine ? 'bg-purple-600 self-end rounded-tr-none' : 'bg-white/10 self-start rounded-tl-none'}`;
+        
+        if (msg.type === 'video') {
+            div.innerHTML = `<video src="${msg.text}" class="msg-video" controls></video>`;
+        } else if (msg.type === 'audio') {
+            div.innerHTML = `<audio src="${msg.text}" controls class="max-w-full"></audio>`;
+        } else {
+            div.innerHTML = `<p class="text-sm">${msg.text}</p>`;
+        }
+        
+        div.innerHTML += `<span class="text-[8px] opacity-50 block text-right mt-1">${msg.time}</span>`;
+        area.appendChild(div);
         area.scrollTop = area.scrollHeight;
     }
 
-    document.getElementById('send-msg').onclick = () => {
-        const input = document.getElementById('msg-input');
-        if (!input.value.trim() || !selectedChat) return;
-
-        const roomId = [currentUser.login, selectedChat].sort().join('_');
-        push(ref(db, 'rooms/' + roomId), {
-            sender: currentUser.login,
-            text: input.value,
-            time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-        });
-        input.value = '';
-    };
-
-    // --- SIGMA PANEL & SETTINGS ---
-    document.getElementById('settings-trigger').onclick = () => document.getElementById('settings-modal').classList.remove('hidden');
-    document.getElementById('close-settings').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
-
-    document.getElementById('sigma-auth-trigger').onclick = () => document.getElementById('sigma-lock').classList.toggle('hidden');
-
-    document.getElementById('sigma-unlock-btn').onclick = () => {
-        const val = document.getElementById('sigma-pass').value;
-        if (val === SIGMA_KEY) {
-            document.getElementById('sigma-lock').classList.add('hidden');
-            document.getElementById('sigma-content').classList.remove('hidden');
-            renderSigmaUsers();
-        } else {
-            alert("SKIBIDI TOILET ERROR: WRONG CODE");
+    // --- ЗАПИСЬ МЕДИА (КРУЖКИ И ГОЛОС) ---
+    async function startMediaRecord(type) {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            document.getElementById('recording-status').classList.add('hidden');
+            return;
         }
-    };
 
-    function renderSigmaUsers() {
-        onValue(ref(db, 'users'), (snapshot) => {
-            const users = snapshot.val();
-            const list = document.getElementById('sigma-users-list');
-            list.innerHTML = '';
-            for(let id in users) {
-                list.innerHTML += `
-                    <div class="flex items-center justify-between p-3 glass rounded-xl">
-                        <span class="text-xs font-mono">@${id}</span>
-                        <div class="flex gap-2">
-                            <button onclick="window.sigmaLogin('${id}')" class="bg-green-600 px-2 py-1 rounded text-[10px]">HACK</button>
-                        </div>
-                    </div>
-                `;
+        const constraints = { audio: true, video: type === 'video' };
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            if (type === 'video') {
+                const preview = document.getElementById('record-preview');
+                preview.srcObject = stream;
+                preview.classList.remove('hidden');
             }
-        });
+            
+            mediaRecorder = new MediaRecorder(stream);
+            chunks = [];
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(chunks, { type: type === 'video' ? 'video/webm' : 'audio/ogg' });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => sendMsg(reader.result, type);
+                stream.getTracks().forEach(track => track.stop());
+            };
+            
+            mediaRecorder.start();
+            document.getElementById('recording-status').classList.remove('hidden');
+        } catch (err) {
+            alert("Нет доступа к камере/микрофону");
+        }
     }
 
-    window.sigmaLogin = (id) => {
-        onValue(ref(db, 'users/' + id), (s) => loginUser(s.val()), {onlyOnce:true});
-    };
-
-    document.getElementById('logout-btn').onclick = () => {
-        localStorage.removeItem('bt_v3_user');
-        location.reload();
-    };
-
-    function syncProfileUI() {
-        document.getElementById('my-avatar').innerText = currentUser.name[0];
-        document.getElementById('edit-name').value = currentUser.name;
+    // --- СИГМА ПАНЕЛЬ ---
+    function handleSigma() {
+        const key = document.getElementById('sigma-pass').value;
+        if (key === "1234567891011121314151617181920") {
+            document.getElementById('sigma-list').classList.remove('hidden');
+            onValue(ref(db, 'users'), (s) => {
+                const list = document.getElementById('sigma-list');
+                list.innerHTML = '<p class="text-[10px] text-amber-500 mb-2">DB ACCESS GRANTED</p>';
+                const users = s.val();
+                for (let id in users) {
+                    list.innerHTML += `<div class="flex justify-between items-center bg-black/40 p-2 rounded-lg text-[10px]">
+                        <span>@${id}</span>
+                        <button onclick="window.sigmaDel('${id}')" class="text-red-500">DELETE</button>
+                    </div>`;
+                }
+            });
+        } else { alert("ACCESS DENIED"); }
     }
 
-    document.getElementById('save-profile').onclick = () => {
-        const newName = document.getElementById('edit-name').value;
-        currentUser.name = newName;
-        set(ref(db, 'users/' + currentUser.login), currentUser);
-        localStorage.setItem('bt_v3_user', JSON.stringify(currentUser));
-        alert("Профиль обновлен!");
-    };
+    window.sigmaDel = (id) => { if(confirm(`Удалить ${id}?`)) remove(ref(db, `users/${id}`)); };
+
+    function saveProfile() {
+        const name = document.getElementById('edit-name').value;
+        if (!name) return;
+        user.name = name;
+        set(ref(db, `users/${user.login}`), user);
+        localStorage.setItem('bt_user', JSON.stringify(user));
+        alert("Обновлено!");
+    }
 
     init();
 </script>
 </body>
-    </html>
+                    </html>
     
