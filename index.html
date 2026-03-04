@@ -8,7 +8,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
         * {
@@ -35,7 +34,6 @@
             flex-direction: column;
             box-shadow: 0 0 50px #8a2be2;
             border: 1px solid #8a2be2;
-            position: relative;
         }
 
         /* НЕОНОВЫЕ ЭФФЕКТЫ */
@@ -43,25 +41,10 @@
             text-shadow: 0 0 5px #b79aff, 0 0 10px #8a6fd0, 0 0 20px #6b4f9f;
         }
 
-        .neon-border {
-            box-shadow: 0 0 5px #8a6fd0, 0 0 10px #6b4f9f;
-            border: 1px solid #b79aff;
-        }
-
-        .neon-glow {
-            animation: neonPulse 2s infinite;
-        }
-
         @keyframes neonPulse {
             0% { box-shadow: 0 0 5px #8a6fd0, 0 0 10px #6b4f9f; }
             50% { box-shadow: 0 0 15px #b79aff, 0 0 30px #8a6fd0; }
             100% { box-shadow: 0 0 5px #8a6fd0, 0 0 10px #6b4f9f; }
-        }
-
-        @keyframes neonTextPulse {
-            0% { text-shadow: 0 0 5px #b79aff, 0 0 10px #8a6fd0; }
-            50% { text-shadow: 0 0 15px #ffffff, 0 0 30px #b79aff; }
-            100% { text-shadow: 0 0 5px #b79aff, 0 0 10px #8a6fd0; }
         }
 
         /* Экран входа */
@@ -71,78 +54,43 @@
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle at 50% 50%, #1a0b2e, #0a0a0f);
-            position: relative;
-            overflow: hidden;
-        }
-
-        #auth-screen::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(138, 43, 226, 0.1) 10px,
-                rgba(138, 43, 226, 0.1) 20px
-            );
-            animation: moveBackground 20s linear infinite;
-        }
-
-        @keyframes moveBackground {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .auth-container {
-            background: rgba(26, 11, 46, 0.9);
+            background: rgba(26, 11, 46, 0.95);
             backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 30px;
             width: 90%;
             max-width: 400px;
             border: 2px solid #8a6fd0;
-            box-shadow: 0 0 30px #8a6fd0, 0 0 60px #4f3780 inset;
-            position: relative;
-            z-index: 10;
-            animation: neonGrow 0.5s ease-out;
-        }
-
-        @keyframes neonGrow {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            box-shadow: 0 0 30px #8a6fd0;
+            animation: neonPulse 3s infinite;
         }
 
         .auth-container h2 {
-            color: #ffffff;
+            color: white;
             text-align: center;
             margin-bottom: 30px;
             font-size: 32px;
-            animation: neonTextPulse 3s infinite;
-            letter-spacing: 2px;
+            text-shadow: 0 0 10px #b79aff;
         }
 
         .auth-input {
             width: 100%;
             padding: 15px;
             margin: 15px 0;
-            background: rgba(45, 27, 74, 0.8);
+            background: rgba(45, 27, 74, 0.9);
             border: 2px solid #6b4f9f;
             border-radius: 15px;
             color: white;
             font-size: 16px;
-            transition: 0.3s;
         }
 
         .auth-input:focus {
             outline: none;
             border-color: #b79aff;
             box-shadow: 0 0 20px #8a6fd0;
-        }
-
-        .auth-input::placeholder {
-            color: #9a8bb8;
         }
 
         .auth-btn {
@@ -157,25 +105,6 @@
             margin: 10px 0;
             cursor: pointer;
             transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .auth-btn:hover::before {
-            left: 100%;
         }
 
         .auth-btn:hover {
@@ -191,7 +120,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             backdrop-filter: blur(5px);
             z-index: 3000;
             justify-content: center;
@@ -217,7 +146,6 @@
             color: #ff6b6b;
             font-size: 24px;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #ff6b6b;
         }
 
         .error-content p {
@@ -235,372 +163,45 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 0 20px #ff6b6b;
         }
 
-        .error-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px #ff6b6b;
-        }
-
-        /* Основной интерфейс */
+        /* Основной интерфейс (упрощенный для теста) */
         #main-app {
             display: none;
             height: 100%;
-            flex-direction: column;
-            background: radial-gradient(circle at 20% 30%, #2d1b4a, #0f0f1a);
-        }
-
-        /* Мобильная навигация */
-        .mobile-nav {
-            display: flex;
-            background: rgba(26, 11, 46, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 10px;
-            gap: 10px;
-            border-bottom: 2px solid #8a6fd0;
-        }
-
-        .mobile-nav-btn {
-            flex: 1;
-            padding: 12px;
-            background: rgba(45, 27, 74, 0.8);
-            border: 1px solid #6b4f9f;
-            border-radius: 25px;
-            color: #b79aff;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .mobile-nav-btn.active {
-            background: linear-gradient(45deg, #8a6fd0, #b79aff);
-            color: white;
-            box-shadow: 0 0 20px #8a6fd0;
-        }
-
-        /* Контейнер с тремя панелями */
-        #panels-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Панель чатов */
-        #chats-panel {
-            width: 100%;
-            background: rgba(45, 27, 74, 0.7);
-            backdrop-filter: blur(10px);
-            border-right: 2px solid #8a6fd0;
-            overflow-y: auto;
-            transition: 0.3s;
-        }
-
-        /* Панель переписки */
-        #chat-panel {
-            width: 100%;
-            background: rgba(45, 27, 74, 0.5);
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Панель профиля */
-        #profile-panel {
-            width: 100%;
-            background: rgba(45, 27, 74, 0.7);
-            backdrop-filter: blur(10px);
-            border-left: 2px solid #8a6fd0;
-            overflow-y: auto;
-        }
-
-        /* Десктопное отображение */
-        @media (min-width: 768px) {
-            #panels-container {
-                display: flex;
-            }
-            
-            #chats-panel {
-                width: 30%;
-                max-width: 350px;
-            }
-            
-            #chat-panel {
-                width: 40%;
-                flex: 1;
-            }
-            
-            #profile-panel {
-                width: 30%;
-                max-width: 350px;
-            }
-            
-            .mobile-nav {
-                display: none;
-            }
-        }
-
-        /* Мобильное отображение */
-        @media (max-width: 767px) {
-            #chats-panel {
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 10;
-                transform: translateX(0);
-            }
-            
-            #chats-panel.hidden {
-                transform: translateX(-100%);
-            }
-            
-            #chat-panel {
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 5;
-            }
-            
-            #profile-panel {
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 15;
-                transform: translateX(100%);
-            }
-            
-            #profile-panel.visible {
-                transform: translateX(0);
-            }
-            
-            .mobile-nav {
-                display: flex;
-            }
-        }
-
-        /* Поиск */
-        .search-box {
-            padding: 15px;
-            background: rgba(26, 11, 46, 0.8);
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(45, 27, 74, 0.8);
-            border: 2px solid #6b4f9f;
-            border-radius: 25px;
-            color: white;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #b79aff;
-            box-shadow: 0 0 20px #8a6fd0;
-        }
-
-        /* Список чатов */
-        .chats-list {
-            padding: 10px;
-        }
-
-        .chat-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: rgba(58, 37, 99, 0.7);
-            backdrop-filter: blur(5px);
-            margin: 5px 0;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid #6b4f9f;
-        }
-
-        .chat-item:hover {
-            background: rgba(79, 55, 128, 0.8);
-            transform: translateX(5px);
-            box-shadow: 0 0 30px #8a6fd0;
-        }
-
-        .chat-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #8a6fd0, #b79aff);
-            border-radius: 15px;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            position: relative;
-            box-shadow: 0 0 20px #8a6fd0;
-        }
-
-        .online-indicator {
-            width: 14px;
-            height: 14px;
-            background: #00ff00;
-            border-radius: 50%;
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            border: 2px solid #3a2563;
-            box-shadow: 0 0 10px #00ff00;
-        }
-
-        /* Шапка чата */
-        .chat-header {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid #8a6fd0;
-        }
-
-        .chat-user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #8a6fd0, #b79aff);
-            border-radius: 12px;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            position: relative;
-            box-shadow: 0 0 15px #8a6fd0;
-        }
-
-        /* Сообщения */
-        .messages-container {
-            flex: 1;
             padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .message {
-            max-width: 80%;
-            margin: 5px 0;
-            padding: 12px 16px;
-            border-radius: 18px;
-            position: relative;
-            animation: messageGlow 0.3s ease-out;
-            border: 1px solid rgba(138, 111, 208, 0.5);
-        }
-
-        @keyframes messageGlow {
-            from { 
-                opacity: 0; 
-                transform: translateY(10px);
-                box-shadow: 0 0 0 transparent;
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0);
-                box-shadow: 0 0 20px #8a6fd0;
-            }
-        }
-
-        .message.own {
-            align-self: flex-end;
-            background: linear-gradient(45deg, #8a6fd0, #6b4f9f);
             color: white;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 0 20px #8a6fd0;
         }
 
-        .message.other {
-            align-self: flex-start;
-            background: rgba(58, 37, 99, 0.8);
-            backdrop-filter: blur(5px);
-            color: white;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #b79aff;
-        }
-
-        /* Поле ввода */
-        .message-input-container {
-            display: flex;
-            padding: 15px;
+        .test-panel {
             background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-top: 2px solid #8a6fd0;
-            gap: 8px;
-            flex-wrap: wrap;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #8a6fd0;
+            text-align: center;
         }
 
-        .attach-btn, .record-btn, .send-btn {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(45deg, #4f3780, #6b4f9f);
-            border: none;
-            border-radius: 25px;
+        .test-panel h1 {
+            color: #b79aff;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .test-panel p {
             color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 0 10px #8a6fd0;
+            margin: 10px 0;
+            font-size: 18px;
         }
 
-        .attach-btn:hover, .record-btn:hover, .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px #b79aff;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 12px;
-            background: rgba(45, 27, 74, 0.8);
-            border: 2px solid #6b4f9f;
-            border-radius: 25px;
+        .logout-btn {
+            background: #ff6b6b;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 10px;
             color: white;
             font-size: 16px;
-            min-width: 150px;
-        }
-
-        .message-input:focus {
-            outline: none;
-            border-color: #b79aff;
-            box-shadow: 0 0 20px #8a6fd0;
-        }
-
-        /* Видео модалка */
-        .video-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .video-preview {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid #8a6fd0;
-            margin: 20px;
-            box-shadow: 0 0 50px #8a6fd0;
+            margin-top: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -610,11 +211,19 @@
         <div id="auth-screen">
             <div class="auth-container">
                 <h2 class="neon-text">💜 BitTalk</h2>
-                <input type="text" id="login-input" class="auth-input" placeholder="Логин" autocomplete="off">
-                <input type="password" id="password-input" class="auth-input" placeholder="Пароль">
-                <div id="auth-error" class="auth-error" style="color: #ff6b6b; text-align: center; margin: 10px 0; display: none;"></div>
-                <button id="login-btn" class="auth-btn neon-glow">🚀 Войти</button>
+                <input type="text" id="login-input" class="auth-input" placeholder="Логин" value="admin" autocomplete="off">
+                <input type="password" id="password-input" class="auth-input" placeholder="Пароль" value="admin" autocomplete="off">
+                <div id="auth-error" style="color: #ff6b6b; text-align: center; margin: 10px 0; display: none;"></div>
+                <button id="login-btn" class="auth-btn">🚀 Войти</button>
                 <button id="register-btn" class="auth-btn" style="background: linear-gradient(45deg, #4f3780, #6b4f9f);">✨ Регистрация</button>
+                
+                <!-- Тестовые аккаунты -->
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                    <p style="color: #b79aff; margin-bottom: 5px;">📋 Тестовые аккаунты:</p>
+                    <p style="color: white;">admin / admin</p>
+                    <p style="color: white;">user / user</p>
+                    <p style="color: white;">test / 123</p>
+                </div>
             </div>
         </div>
 
@@ -627,43 +236,199 @@
             </div>
         </div>
 
-        <!-- Основное приложение -->
+        <!-- Основное приложение (тестовая заглушка) -->
         <div id="main-app">
-            <!-- Мобильная навигация -->
-            <div class="mobile-nav">
-                <button class="mobile-nav-btn active" data-panel="chats">💬 Чаты</button>
-                <button class="mobile-nav-btn" data-panel="profile">👤 Профиль</button>
-                <button class="mobile-nav-btn" data-panel="settings">⚙️ Настройки</button>
-            </div>
-
-            <!-- Панели -->
-            <div id="panels-container">
-                <!-- Список чатов -->
-                <div id="chats-panel">
-                    <div class="search-box">
-                        <input type="text" id="user-search" class="search-input" placeholder="🔍 Поиск пользователей...">
-                        <div id="search-results" class="search-results" style="display: none;"></div>
-                    </div>
-                    <div class="chats-list" id="chats-list">
-                        <!-- Чаты будут добавляться сюда -->
-                    </div>
+            <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                <div class="test-panel">
+                    <h1>💜 Добро пожаловать в BitTalk!</h1>
+                    <p id="welcome-user"></p>
+                    <p>✅ Вы успешно вошли в систему</p>
+                    <p>✨ Здесь будет полный интерфейс мессенджера</p>
+                    <button class="logout-btn" id="test-logout">Выйти</button>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Окно переписки -->
-                <div id="chat-panel">
-                    <div class="chat-header" id="chat-header" style="display: none;">
-                        <button class="back-btn" id="back-to-chats">←</button>
-                        <div class="chat-user-avatar" id="chat-avatar">👤</div>
-                        <div class="chat-user-info">
-                            <div class="chat-user-name" id="chat-name">Выберите чат</div>
-                            <div class="chat-user-status" id="chat-status"></div>
-                            <div class="typing-indicator" id="typing-indicator" style="display: none;"></div>
-                        </div>
-                        <button class="chat-settings-btn" id="chat-profile-btn">👤</button>
-                    </div>
-                    <div class="messages-container" id="messages-container">
-                        <!-- Сообщения будут добавляться сюда -->
-                    </div>
-                    <div class="message-input-container" id="message-input-container" style="display: none;">
-                        <input type="file" id="photo-upload" accept="image/*" style="display: none;">
-      
+    <script>
+        // ========== ЛОКАЛЬНАЯ БАЗА ДАННЫХ (не требует Firebase) ==========
+        const LOCAL_USERS_KEY = 'bittalk_users';
+        
+        // База пользователей (в памяти)
+        let users = [];
+        
+        // Загружаем пользователей из localStorage или создаем тестовых
+        function loadUsers() {
+            const saved = localStorage.getItem(LOCAL_USERS_KEY);
+            if (saved) {
+                users = JSON.parse(saved);
+            } else {
+                // Тестовые пользователи
+                users = [
+                    {
+                        id: '1',
+                        login: 'admin',
+                        password: 'admin',
+                        name: 'Админ',
+                        username: '@admin',
+                        bio: 'Главный администратор'
+                    },
+                    {
+                        id: '2',
+                        login: 'user',
+                        password: 'user',
+                        name: 'Пользователь',
+                        username: '@user',
+                        bio: 'Обычный пользователь'
+                    },
+                    {
+                        id: '3',
+                        login: 'test',
+                        password: '123',
+                        name: 'Тест',
+                        username: '@test',
+                        bio: 'Тестовый аккаунт'
+                    }
+                ];
+                saveUsers();
+            }
+        }
+        
+        function saveUsers() {
+            localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+        }
+        
+        // Инициализируем базу
+        loadUsers();
+
+        // ========== ЭЛЕМЕНТЫ DOM ==========
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.getElementById('main-app');
+        const loginInput = document.getElementById('login-input');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const authError = document.getElementById('auth-error');
+        const welcomeUser = document.getElementById('welcome-user');
+        
+        // Модальное окно ошибки
+        const errorModal = document.getElementById('error-modal');
+        const errorMessage = document.getElementById('error-message');
+        const closeError = document.getElementById('close-error');
+
+        // ========== ФУНКЦИИ ==========
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorModal.classList.add('active');
+        }
+
+        closeError.addEventListener('click', () => {
+            errorModal.classList.remove('active');
+        });
+
+        // Проверка существования пользователя
+        function findUser(login, password) {
+            return users.find(u => u.login === login && u.password === password);
+        }
+
+        function findUserByLogin(login) {
+            return users.find(u => u.login === login);
+        }
+
+        // ========== ВХОД ==========
+        loginBtn.addEventListener('click', () => {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            console.log('Попытка входа:', login, password);
+            
+            if (!login || !password) {
+                showError('❌ Заполните все поля!');
+                return;
+            }
+            
+            const user = findUser(login, password);
+            
+            if (user) {
+                console.log('Успешный вход:', user);
+                authScreen.style.display = 'none';
+                mainApp.style.display = 'flex';
+                welcomeUser.textContent = `👤 ${user.name} (${user.username})`;
+                
+                // Очищаем поля
+                loginInput.value = '';
+                passwordInput.value = '';
+            } else {
+                console.log('Пользователь не найден');
+                showError('❌ Нет такого пользователя с таким логином и паролем');
+            }
+        });
+
+        // ========== РЕГИСТРАЦИЯ ==========
+        registerBtn.addEventListener('click', () => {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            console.log('Попытка регистрации:', login, password);
+            
+            if (!login || !password) {
+                showError('❌ Заполните все поля');
+                return;
+            }
+            
+            if (login.length < 3) {
+                showError('❌ Логин должен быть не менее 3 символов');
+                return;
+            }
+            
+            if (password.length < 3) {
+                showError('❌ Пароль должен быть не менее 3 символов');
+                return;
+            }
+            
+            // Проверяем, существует ли пользователь
+            const existingUser = findUserByLogin(login);
+            
+            if (existingUser) {
+                showError('❌ Пользователь с таким логином уже существует');
+                return;
+            }
+            
+            // Создаем нового пользователя
+            const newUser = {
+                id: Date.now().toString(),
+                login: login,
+                password: password,
+                name: login,
+                username: '@' + login,
+                bio: ''
+            };
+            
+            users.push(newUser);
+            saveUsers();
+            
+            console.log('Новый пользователь создан:', newUser);
+            
+            // Автоматически входим
+            authScreen.style.display = 'none';
+            mainApp.style.display = 'flex';
+            welcomeUser.textContent = `👤 ${newUser.name} (${newUser.username})`;
+            
+            loginInput.value = '';
+            passwordInput.value = '';
+        });
+
+        // ========== ВЫХОД ==========
+        const testLogout = document.getElementById('test-logout');
+        if (testLogout) {
+            testLogout.addEventListener('click', () => {
+                mainApp.style.display = 'none';
+                authScreen.style.display = 'flex';
+            });
+        }
+
+        // ========== ТЕСТИРОВАНИЕ ==========
+        console.log('✅ Система готова. Тестовые пользователи:', users);
+    </script>
+</body>
+</html>
