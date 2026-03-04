@@ -3,337 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitTalk Elite v.9 | Global Search & Groups</title>
+    <title>BitTalk Real-Time OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --p: #a855f7; --bg: #0c0617; --glass: rgba(25, 12, 45, 0.9); }
-        body { background: var(--bg); color: #f3e8ff; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(168, 85, 247, 0.2); }
+        :root { --p: #a855f7; --bg: #08040d; --glass: rgba(18, 10, 25, 0.95); }
+        body { background: var(--bg); color: #f3e8ff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        .glass { background: var(--glass); backdrop-filter: blur(30px); border: 1px solid rgba(168, 85, 247, 0.1); }
         
-        /* Message Logic */
-        .bubble { max-width: 80%; padding: 12px; border-radius: 20px; position: relative; animation: slideUp 0.2s ease; cursor: pointer; }
-        .bubble-mine { background: linear-gradient(135deg, #9333ea, #6b21a8); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bubble-other { background: #1e113a; align-self: flex-start; border-bottom-left-radius: 4px; }
+        /* Messages */
+        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 20px; position: relative; transition: all 0.2s; cursor: pointer; }
+        .bubble-mine { background: linear-gradient(135deg, #9333ea, #6b21a8); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2); }
+        .bubble-other { background: #1a1225; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.1); }
         
-        /* UI Elements */
-        .video-note { width: 170px; height: 170px; border-radius: 50%; object-fit: cover; border: 2px solid var(--p); }
-        #context-menu { position: fixed; z-index: 1000; display: none; width: 180px; }
-        .menu-item { padding: 12px; cursor: pointer; transition: 0.2s; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .menu-item:hover { background: rgba(168, 85, 247, 0.2); }
+        /* Media */
+        .video-note { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 2px solid var(--p); background: #000; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg); display: inline-block; }
+        .online { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        
+        /* Context Menu */
+        #ctx-menu { position: fixed; z-index: 1000; display: none; width: 180px; }
+        .ctx-item { padding: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ctx-item:hover { background: rgba(168, 85, 247, 0.2); }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .msg-anim { animation: fadeIn 0.3s ease forwards; }
 
         @media (max-width: 768px) {
-            #side-panel { width: 100%; position: absolute; z-index: 20; transition: 0.3s; }
+            #side-panel { width: 100%; position: absolute; z-index: 20; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             .side-hidden { transform: translateX(-100%); }
+            #chat-window { width: 100%; }
         }
     </style>
 </head>
-<body class="h-screen flex">
+<body class="flex">
 
-<div id="auth-screen" class="fixed inset-0 z-[2000] bg-[#0c0617] flex items-center justify-center p-6">
-    <div class="glass p-8 rounded-[40px] w-full max-w-sm text-center">
-        <div class="w-16 h-16 bg-p rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold">BT</div>
-        <h1 class="text-2xl font-black mb-6 italic tracking-tighter">BitTalk OS</h1>
+<div id="auth-screen" class="fixed inset-0 z-[2000] bg-[#08040d] flex items-center justify-center p-6">
+    <div class="glass p-10 rounded-[45px] w-full max-w-sm text-center shadow-2xl">
+        <div class="w-20 h-20 bg-p rounded-3xl mx-auto mb-6 flex items-center justify-center text-3xl font-bold shadow-p/50 shadow-2xl">BT</div>
+        <h1 class="text-3xl font-black italic mb-2">BitTalk</h1>
+        <p class="text-p/50 text-[10px] uppercase tracking-[0.4em] mb-8 font-bold">Real-Time Edition</p>
         <input id="auth-login" type="text" placeholder="@username" class="w-full p-4 mb-3 rounded-2xl bg-black/40 border border-p/20 outline-none focus:border-p">
-        <input id="auth-pass" type="password" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-black/40 border border-p/20 outline-none focus:border-p">
-        <button id="auth-btn" class="w-full py-4 bg-p rounded-2xl font-bold shadow-lg shadow-p/30">Начать общение</button>
+        <input id="auth-pass" type="password" placeholder="Password" class="w-full p-4 mb-8 rounded-2xl bg-black/40 border border-p/20 outline-none focus:border-p">
+        <button id="auth-btn" class="w-full py-4 bg-p rounded-2xl font-bold hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-p/20">Войти / Создать</button>
     </div>
 </div>
 
-<div id="side-panel" class="w-full md:w-[380px] flex flex-col glass border-r border-white/5 transition-transform">
+<div id="side-panel" class="w-full md:w-[380px] flex flex-col glass border-r border-white/5">
     <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-black italic">BitTalk</h2>
+            <h2 class="text-2xl font-black italic tracking-tighter">Чаты</h2>
             <div class="flex gap-2">
-                <button id="create-group" class="p-2 bg-p/20 rounded-xl" title="Создать группу">👥</button>
-                <button id="open-settings" class="p-2 bg-p/20 rounded-xl">⚙️</button>
+                <button id="btn-create-group" class="p-2 bg-p/10 rounded-xl hover:bg-p/20">👥</button>
+                <button id="btn-settings" class="p-2 bg-p/10 rounded-xl hover:bg-p/20">⚙️</button>
             </div>
         </div>
         <div class="relative">
-            <input id="global-search" type="text" placeholder="Поиск по юзернейму..." class="w-full p-3 pl-10 rounded-xl bg-black/40 border border-p/10 outline-none text-xs focus:border-p/50">
+            <input id="global-search" type="text" placeholder="Поиск @юзернейм..." class="w-full p-3 pl-10 rounded-xl bg-black/40 border border-p/10 outline-none text-xs focus:border-p/40">
             <span class="absolute left-3 top-3 opacity-30">🔍</span>
-            <div id="search-results" class="absolute top-full left-0 right-0 z-50 glass mt-2 rounded-2xl overflow-hidden hidden shadow-2xl"></div>
+            <div id="search-res" class="absolute top-full left-0 right-0 z-50 glass mt-2 rounded-2xl hidden shadow-2xl overflow-hidden border border-p/30"></div>
         </div>
     </div>
     <div id="chats-list" class="flex-1 overflow-y-auto px-4 space-y-1"></div>
 </div>
 
 <div id="chat-window" class="flex-1 flex flex-col relative">
-    <div id="chat-header" class="p-4 glass flex justify-between items-center cursor-pointer">
+    <div id="chat-header" class="p-4 glass flex justify-between items-center z-10 shadow-lg cursor-pointer">
         <div class="flex items-center gap-3">
-            <button id="back-btn" class="md:hidden">⬅️</button>
-            <div id="h-avatar" class="w-10 h-10 bg-p rounded-xl flex items-center justify-center font-bold">?</div>
+            <button id="back-btn" class="md:hidden text-xl">⬅️</button>
+            <div id="h-avatar" class="w-11 h-11 bg-p rounded-2xl flex items-center justify-center font-bold shadow-lg">?</div>
             <div>
                 <h3 id="h-name" class="font-bold text-sm leading-none">Выберите чат</h3>
-                <p id="h-status" class="text-[9px] text-p font-bold uppercase tracking-widest mt-1">офлайн</p>
+                <div class="flex items-center gap-1 mt-1">
+                    <span id="h-status-dot" class="status-dot"></span>
+                    <p id="h-status-text" class="text-[9px] text-p uppercase font-bold tracking-widest">offline</p>
+                </div>
+                <p id="typing-indicator" class="text-[10px] text-green-400 italic hidden">печатает...</p>
             </div>
         </div>
+        <div class="opacity-30">⋮</div>
     </div>
 
-    <div id="msg-area" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4"></div>
+    <div id="msg-flow" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+        </div>
 
     <div class="p-4 glass">
-        <div id="reply-ui" class="hidden bg-white/5 p-2 rounded-xl mb-2 flex justify-between text-xs italic">
-            <span id="reply-val">Ответ...</span>
-            <button onclick="clearReply()">✕</button>
+        <div id="reply-preview" class="hidden bg-white/5 p-2 rounded-xl mb-2 flex justify-between text-xs italic">
+            <span id="reply-label">Ответ...</span>
+            <button onclick="cancelReply()">✕</button>
         </div>
-        <div class="flex items-end gap-2 p-2 bg-black/30 rounded-[24px]">
-            <input type="file" id="img-input" class="hidden" accept="image/*">
-            <button id="btn-img" class="p-3 text-xl">🖼️</button>
-            <textarea id="msg-input" rows="1" placeholder="Сообщение..." class="flex-1 bg-transparent p-3 outline-none resize-none text-sm"></textarea>
-            <button id="btn-video" class="p-3 text-xl">🎥</button>
-            <button id="btn-send" class="p-4 bg-p rounded-2xl shadow-lg shadow-p/40 transition-transform active:scale-90">
+        <div class="max-w-4xl mx-auto flex items-end gap-2 p-2 bg-black/20 rounded-[26px] border border-white/5">
+            <input type="file" id="file-input" class="hidden" accept="image/*">
+            <button id="btn-file" class="p-3 text-xl hover:scale-110 transition-transform">📎</button>
+            <textarea id="msg-input" rows="1" placeholder="Ваше сообщение..." class="flex-1 bg-transparent p-3 outline-none resize-none text-sm"></textarea>
+            <button id="btn-voice" class="p-3 text-xl hover:scale-110 transition-transform">🎤</button>
+            <button id="btn-circle" class="p-3 text-xl hover:scale-110 transition-transform">🎥</button>
+            <button id="send-btn" class="p-4 bg-p rounded-2xl shadow-lg shadow-p/40 active:scale-90 transition-all">
                 <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
     </div>
 </div>
 
-<div id="context-menu" class="glass rounded-2xl overflow-hidden shadow-2xl shadow-black">
-    <div class="menu-item" onclick="msgAction('reply')">↩️ Ответить</div>
-    <div class="menu-item" onclick="msgAction('edit')" id="m-edit">✏️ Редактировать</div>
-    <div class="menu-item" onclick="msgAction('forward')">➡️ Переслать</div>
-    <div class="menu-item text-red-400" onclick="msgAction('delete')">🗑️ Удалить</div>
+<div id="ctx-menu" class="glass rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+    <div class="ctx-item" onclick="msgAction('reply')">↩️ Ответить</div>
+    <div class="ctx-item" onclick="msgAction('edit')" id="m-edit">✏️ Редактировать</div>
+    <div class="ctx-item" onclick="msgAction('forward')">➡️ Переслать</div>
+    <div class="ctx-item text-red-400" onclick="msgAction('delete')">🗑️ Удалить</div>
+    <div class="flex p-2 justify-around border-t border-white/5">
+        <span onclick="msgAction('react', '❤️')" class="cursor-pointer">❤️</span>
+        <span onclick="msgAction('react', '👍')" class="cursor-pointer">👍</span>
+        <span onclick="msgAction('react', '🔥')" class="cursor-pointer">🔥</span>
+    </div>
 </div>
 
-<div id="modal" class="fixed inset-0 z-[500] bg-black/90 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div id="modal-box" class="glass w-full max-w-md p-8 rounded-[40px] relative shadow-2xl">
-        <button onclick="closeModal()" class="absolute top-6 right-6 text-xl">✕</button>
+<div id="modal-overlay" class="fixed inset-0 z-[1500] bg-black/90 hidden flex items-center justify-center p-4">
+    <div id="modal-content" class="glass w-full max-w-md p-8 rounded-[40px] relative">
+        <button onclick="closeModal()" class="absolute top-6 right-6">✕</button>
         <div id="modal-body"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, onValue, set, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, onValue, set, update, remove, serverTimestamp, onChildChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    const fbConf = {
+    const firebaseConfig = {
         apiKey: "AIzaSyCaCtnz5ZJPJtq04Xm24dw5xc7QPZUHue",
         authDomain: "bittalk-e6df4.firebaseapp.com",
         databaseURL: "https://bittalk-e6df4-default-rtdb.firebaseio.com",
         projectId: "bittalk-e6df4"
     };
 
-    const fb = initializeApp(fbConf);
-    const db = getDatabase(fb);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    let user = JSON.parse(localStorage.getItem('bt_v9_user')) || null;
-    let activeChat = null; 
-    let activeRoom = null;
+    let user = JSON.parse(localStorage.getItem('bt_rt_user')) || null;
+    let activeChatId = null;
+    let currentRoom = null;
     let selectedMsg = null;
     let replyId = null;
     let editingId = null;
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
+    // --- AUTH & INIT ---
     if(user) {
         document.getElementById('auth-screen').classList.add('hidden');
         renderChatList();
-        updateStatus(true);
+        updateOnlineStatus(true);
     }
 
-    // --- АВТОРИЗАЦИЯ ---
     document.getElementById('auth-btn').onclick = () => {
         const login = document.getElementById('auth-login').value.trim().replace('@','').toLowerCase();
         const pass = document.getElementById('auth-pass').value.trim();
-        if(!login || !pass) return alert("Заполни поля");
+        if(!login || !pass) return;
 
         onValue(ref(db, `users/${login}`), (s) => {
-            if(s.exists() && s.val().pass !== pass) return alert("Неверный пароль");
-            const uData = s.exists() ? s.val() : { login, pass, name: login, bio: 'Привет! Я в BitTalk', groups: [] };
-            if(!s.exists()) set(ref(db, `users/${login}`), uData);
-            localStorage.setItem('bt_v9_user', JSON.stringify(uData));
+            if(s.exists() && s.val().pass !== pass) return alert("Неверный пароль!");
+            const data = s.exists() ? s.val() : { login, pass, name: login, bio: 'BitTalk Elite User', avatar: '' };
+            if(!s.exists()) set(ref(db, `users/${login}`), data);
+            localStorage.setItem('bt_rt_user', JSON.stringify(data));
             location.reload();
         }, {onlyOnce: true});
     };
 
-    // --- ГЛОБАЛЬНЫЙ ПОИСК ---
-    document.getElementById('global-search').oninput = (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        const resDiv = document.getElementById('search-results');
-        if(!query) return resDiv.classList.add('hidden');
-
-        onValue(ref(db, 'users'), (s) => {
-            const users = s.val();
-            resDiv.innerHTML = '';
-            resDiv.classList.remove('hidden');
-            for(let id in users) {
-                if(id.includes(query) && id !== user.login) {
-                    const d = document.createElement('div');
-                    d.className = "p-4 hover:bg-p/20 cursor-pointer text-sm border-b border-white/5";
-                    d.innerHTML = `<b>@${id}</b> <span class="opacity-50 ml-2">${users[id].name}</span>`;
-                    d.onclick = () => { openChat(id, users[id].name); resDiv.classList.add('hidden'); };
-                    resDiv.appendChild(d);
-                }
-            }
-        });
-    };
-
-    // --- ГРУППОВЫЕ ЧАТЫ ---
-    document.getElementById('create-group').onclick = () => {
-        onValue(ref(db, 'users'), (s) => {
-            const users = s.val();
-            let html = '<h3 class="text-xl font-bold mb-4">Создать группу</h3><div class="space-y-2 max-h-60 overflow-y-auto">';
-            for(let id in users) {
-                if(id === user.login) continue;
-                html += `<label class="flex justify-between p-3 bg-white/5 rounded-xl cursor-pointer">
-                    <span>@${id}</span> <input type="checkbox" value="${id}" class="g-member">
-                </label>`;
-            }
-            html += `</div><input id="g-name" placeholder="Название группы" class="w-full p-4 mt-4 rounded-xl bg-black/40 border border-p/20">
-                     <button onclick="window.finishGroup()" class="w-full py-4 bg-p mt-4 rounded-xl font-bold">Создать</button>`;
-            showModal(html);
-        }, {onlyOnce: true});
-    };
-
-    window.finishGroup = () => {
-        const name = document.getElementById('g-name').value;
-        const members = Array.from(document.querySelectorAll('.g-member:checked')).map(i => i.value);
-        if(!name || members.length < 1) return alert("Укажите имя и участников");
-        members.push(user.login);
-        const gId = 'group_' + Date.now();
-        set(ref(db, `groups/${gId}`), { name, members });
-        closeModal();
-        openChat(gId, name, true);
-    };
-
-    // --- ЛОГИКА ЧАТА ---
+    // --- REAL-TIME CHAT LIST & SEARCH ---
     function renderChatList() {
         onValue(ref(db, 'users'), (s) => {
             const list = document.getElementById('chats-list');
             list.innerHTML = '';
-            const data = s.val();
-            // Сюда можно добавить логику отображения только тех, с кем есть диалог
-            for(let id in data) {
+            const users = s.val();
+            for(let id in users) {
                 if(id === user.login) continue;
-                const u = data[id];
+                const u = users[id];
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-3 p-4 rounded-2xl cursor-pointer hover:bg-p/10 transition-all";
-                div.innerHTML = `<div class="w-12 h-12 bg-p rounded-xl flex items-center justify-center font-bold">${u.name[0]}</div>
-                                 <div class="flex-1"><h4 class="font-bold text-sm">@${id}</h4><p class="text-[10px] text-p">${u.isOnline ? 'online' : 'offline'}</p></div>`;
+                div.innerHTML = `
+                    <div class="relative">
+                        <div class="w-12 h-12 bg-p rounded-xl flex items-center justify-center font-bold">${u.name[0]}</div>
+                        <div class="status-dot ${u.isOnline ? 'online' : 'bg-gray-700'} absolute bottom-0 right-0"></div>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm">@${id}</h4>
+                        <p class="text-[10px] opacity-40">${u.isOnline ? 'В сети' : 'Офлайн'}</p>
+                    </div>
+                `;
                 div.onclick = () => openChat(id, u.name);
                 list.appendChild(div);
             }
         });
     }
 
-    function openChat(id, name, isGroup = false) {
-        activeChat = id;
-        activeRoom = isGroup ? id : [user.login, id].sort().join('_');
-        document.getElementById('h-name').innerText = isGroup ? name : `@${id}`;
-        document.getElementById('msg-area').innerHTML = '';
+    document.getElementById('global-search').oninput = (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        const res = document.getElementById('search-res');
+        if(!q) return res.classList.add('hidden');
+        onValue(ref(db, 'users'), (s) => {
+            const users = s.val();
+            res.innerHTML = ''; res.classList.remove('hidden');
+            for(let id in users) {
+                if(id.includes(q) && id !== user.login) {
+                    const d = document.createElement('div');
+                    d.className = "p-4 hover:bg-p/20 cursor-pointer text-sm border-b border-white/5";
+                    d.innerHTML = `@${id} <span class="opacity-40 text-[10px] ml-2">${users[id].name}</span>`;
+                    d.onclick = () => { openChat(id, users[id].name); res.classList.add('hidden'); };
+                    res.appendChild(d);
+                }
+            }
+        });
+    };
+
+    // --- REAL-TIME MESSAGING ---
+    function openChat(id, name) {
+        activeChatId = id;
+        currentRoom = [user.login, id].sort().join('_');
+        document.getElementById('h-name').innerText = `@${id}`;
+        document.getElementById('msg-flow').innerHTML = '';
         if(window.innerWidth < 768) document.getElementById('side-panel').classList.add('side-hidden');
         
-        onValue(ref(db, `rooms/${activeRoom}`), (s) => {
-            document.getElementById('msg-area').innerHTML = '';
+        // Load Real-time Messages
+        const roomRef = ref(db, `rooms/${currentRoom}`);
+        onValue(roomRef, (s) => {
+            document.getElementById('msg-flow').innerHTML = '';
             const msgs = s.val();
-            for(let mId in msgs) renderMsg(mId, msgs[mId]);
+            for(let mId in msgs) renderMessage(mId, msgs[mId]);
+            // Mark as read (vv blue)
+            if(msgs) {
+                for(let mId in msgs) {
+                    if(msgs[mId].sender !== user.login) update(ref(db, `rooms/${currentRoom}/${mId}`), { read: true });
+                }
+            }
+        });
+
+        // Online Status Real-time
+        onValue(ref(db, `users/${id}`), (s) => {
+            const u = s.val();
+            document.getElementById('h-status-dot').className = `status-dot ${u.isOnline ? 'online' : 'bg-gray-700'}`;
+            document.getElementById('h-status-text').innerText = u.isOnline ? 'Online' : 'Offline';
+            document.getElementById('typing-indicator').style.display = u.isTyping === user.login ? 'block' : 'none';
         });
     }
 
-    function renderMsg(mId, msg) {
-        const area = document.getElementById('msg-area');
+    function renderMessage(mId, msg) {
+        const flow = document.getElementById('msg-flow');
         const isMine = msg.sender === user.login;
         const div = document.createElement('div');
-        div.className = `bubble ${isMine ? 'bubble-mine' : 'bubble-other'}`;
-        div.id = `msg-${mId}`;
+        div.className = `bubble ${isMine ? 'bubble-mine' : 'bubble-other'} msg-anim`;
         
-        let content = '';
+        let content = `<p class="text-sm">${msg.text}</p>`;
+        if(msg.type === 'img') content = `<img src="${msg.data}" class="rounded-xl max-w-full">`;
         if(msg.type === 'video') content = `<video src="${msg.data}" class="video-note" controls></video>`;
-        else if(msg.type === 'img') content = `<img src="${msg.data}" class="max-w-full rounded-xl">`;
-        else content = `<p class="text-sm">${msg.text}</p>`;
+        
+        const status = msg.read ? '<span class="text-blue-400">vv</span>' : '<span>v</span>';
 
         div.innerHTML = `
-            ${msg.replyTo ? `<div class="text-[10px] opacity-50 border-l-2 pl-2 mb-1">В ответ на сообщение</div>` : ''}
+            ${msg.replyTo ? `<div class="text-[9px] opacity-40 border-l-2 pl-2 mb-2">В ответ...</div>` : ''}
             ${content}
-            <div class="text-[8px] opacity-40 text-right mt-1">${msg.time} ${msg.edited ? '(ред.)' : ''} ✓✓</div>
+            <div class="flex justify-end gap-1 mt-1 opacity-40 text-[8px]">
+                <span>${msg.time}</span>
+                ${isMine ? status : ''}
+                ${msg.edited ? '<span>ред.</span>' : ''}
+            </div>
         `;
         
         div.oncontextmenu = (e) => {
             e.preventDefault();
             selectedMsg = { id: mId, text: msg.text };
-            const menu = document.getElementById('context-menu');
+            const menu = document.getElementById('ctx-menu');
             menu.style.display = 'block';
-            menu.style.left = e.pageX + 'px';
-            menu.style.top = e.pageY + 'px';
+            menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px';
             document.getElementById('m-edit').style.display = isMine ? 'block' : 'none';
         };
-        area.appendChild(div);
-        area.scrollTop = area.scrollHeight;
+
+        flow.appendChild(div);
+        flow.scrollTop = flow.scrollHeight;
     }
 
-    // --- ДЕЙСТВИЯ ---
-    document.getElementById('btn-send').onclick = () => {
+    // --- ACTIONS ---
+    document.getElementById('send-btn').onclick = () => {
         const input = document.getElementById('msg-input');
         const text = input.value.trim();
-        if(!text || !activeRoom) return;
+        if(!text || !currentRoom) return;
 
         if(editingId) {
-            update(ref(db, `rooms/${activeRoom}/${editingId}`), { text, edited: true });
+            update(ref(db, `rooms/${currentRoom}/${editingId}`), { text, edited: true });
             editingId = null;
         } else {
-            push(ref(db, `rooms/${activeRoom}`), {
+            push(ref(db, `rooms/${currentRoom}`), {
                 sender: user.login,
                 text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                replyTo: replyId
+                read: false, replyTo: replyId
             });
         }
-        input.value = '';
-        window.clearReply();
+        input.value = ''; cancelReply();
+        update(ref(db, `users/${user.login}`), { isTyping: false });
     };
 
-    window.msgAction = (act) => {
-        document.getElementById('context-menu').style.display = 'none';
-        if(act === 'delete') remove(ref(db, `rooms/${activeRoom}/${selectedMsg.id}`));
-        if(act === 'edit') {
-            editingId = selectedMsg.id;
-            document.getElementById('msg-input').value = selectedMsg.text;
-        }
-        if(act === 'reply') {
-            replyId = selectedMsg.id;
-            document.getElementById('reply-ui').classList.remove('hidden');
-        }
+    // --- TYPING INDICATOR ---
+    document.getElementById('msg-input').oninput = () => {
+        update(ref(db, `users/${user.login}`), { isTyping: activeChatId });
+        clearTimeout(window.typeTimer);
+        window.typeTimer = setTimeout(() => update(ref(db, `users/${user.login}`), { isTyping: false }), 2000);
+    };
+
+    window.msgAction = (act, val) => {
+        document.getElementById('ctx-menu').style.display = 'none';
+        const msgRef = ref(db, `rooms/${currentRoom}/${selectedMsg.id}`);
+        if(act === 'delete') remove(msgRef);
+        if(act === 'edit') { editingId = selectedMsg.id; document.getElementById('msg-input').value = selectedMsg.text; }
+        if(act === 'reply') { replyId = selectedMsg.id; document.getElementById('reply-preview').classList.remove('hidden'); }
+        if(act === 'react') set(ref(db, `rooms/${currentRoom}/${selectedMsg.id}/reactions/${user.login}`), val);
         if(act === 'forward') {
             const target = prompt("Кому переслать (@username)?");
             if(target) {
                 const room = [user.login, target.replace('@','')].sort().join('_');
-                push(ref(db, `rooms/${room}`), { sender: user.login, text: `[Переслано]: ${selectedMsg.text}`, time: 'now' });
+                push(ref(db, `rooms/${room}`), { sender: user.login, text: `[Forward]: ${selectedMsg.text}`, time: 'now', read: false });
                 alert("Переслано!");
             }
         }
     };
 
-    // --- ОБЩИЕ ФУНКЦИИ ---
-    function showModal(html) {
-        document.getElementById('modal-body').innerHTML = html;
-        document.getElementById('modal').classList.remove('hidden');
+    // --- SYSTEM UTILS ---
+    function updateOnlineStatus(st) {
+        if(user) update(ref(db, `users/${user.login}`), { isOnline: st, lastSeen: serverTimestamp() });
     }
-    window.closeModal = () => document.getElementById('modal').classList.add('hidden');
-    window.clearReply = () => { replyId = null; document.getElementById('reply-ui').classList.add('hidden'); };
-    window.onclick = () => document.getElementById('context-menu').style.display = 'none';
+    window.onbeforeunload = () => updateOnlineStatus(false);
+    window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
+    window.closeModal = () => document.getElementById('modal-overlay').classList.add('hidden');
+    window.cancelReply = () => { replyId = null; document.getElementById('reply-preview').classList.add('hidden'); };
 
-    document.getElementById('open-settings').onclick = () => {
-        const pass = prompt("Sigma Password:");
+    // --- SETTINGS & SIGMA ---
+    document.getElementById('btn-settings').onclick = () => {
+        const pass = prompt("Enter Key:");
         if(pass === "1234567891011121314151617181920") {
             onValue(ref(db, 'users'), (s) => {
                 const users = s.val();
-                let h = '<h3 class="text-amber-500 font-bold mb-4">Sigma Panel</h3>';
-                for(let id in users) h += `<div class="flex justify-between mb-2 text-xs"><span>@${id}</span> <button onclick="remove(ref(db, 'users/${id}'))" class="text-red-500">DEL</button></div>`;
-                showModal(h);
+                let h = '<h3 class="text-amber-500 font-bold mb-4">Sigma Admin</h3>';
+                for(let id in users) h += `<div class="flex justify-between p-2 text-xs border-b border-white/5"><span>@${id}</span> <button onclick="remove(ref(db, 'users/${id}'))" class="text-red-500">DEL</button></div>`;
+                document.getElementById('modal-body').innerHTML = h;
+                document.getElementById('modal-overlay').classList.remove('hidden');
             });
         } else {
-            showModal(`<div class="text-center">
-                <h3 class="text-xl font-bold mb-4">Ваш профиль</h3>
-                <p>Имя: ${user.name}</p><p class="mb-4">@${user.login}</p>
-                <button onclick="localStorage.clear(); location.reload()" class="w-full py-3 bg-red-500 rounded-xl">Выйти</button>
-            </div>`);
+            document.getElementById('modal-body').innerHTML = `
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-p rounded-3xl mx-auto mb-4 flex items-center justify-center font-bold text-2xl">${user.name[0]}</div>
+                    <h3 class="text-xl font-bold">${user.name}</h3>
+                    <p class="text-p opacity-50 mb-6">@${user.login}</p>
+                    <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 bg-red-500/20 text-red-500 rounded-2xl font-bold">Выйти из аккаунта</button>
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.remove('hidden');
         }
     };
 
     document.getElementById('back-btn').onclick = () => document.getElementById('side-panel').classList.remove('side-hidden');
 
-    function updateStatus(st) {
-        if(user) update(ref(db, `users/${user.login}`), { isOnline: st });
-    }
-    window.onbeforeunload = () => updateStatus(false);
 </script>
 </body>
 </html>
+
