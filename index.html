@@ -73,7 +73,7 @@
         /* ЭКРАН АВТОРИЗАЦИИ */
         #auth-screen {
             height: 100%;
-            display: flex;
+            display: flex !important;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle at 50% 50%, #1a0b2e, #0a0a0f);
@@ -120,6 +120,8 @@
             color: white;
             font-size: 16px;
             transition: 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .auth-input:focus {
@@ -141,6 +143,11 @@
             margin: 10px 0;
             cursor: pointer;
             transition: 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
         }
 
         .auth-btn:hover {
@@ -672,7 +679,4 @@
                     <button class="profile-btn" style="margin: 10px; width: calc(100% - 20px);" id="create-group-btn">➕ Создать группу</button>
                 </div>
 
-                <!-- Сообщения -->
-                <div class="messages-column">
-                    <div class="chat-header" id="chat-header" style="display: none;">
-                        <div class="chat-header-avatar" id="chat-header
+                <!-- Сообщения 
