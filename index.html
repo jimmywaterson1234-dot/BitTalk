@@ -35,7 +35,7 @@
             overflow: hidden;
         }
 
-        /* ========== АНИМИРОВАННЫЙ ФОН С ТЕКСТОМ ========== */
+        /* АНИМИРОВАННЫЙ ФОН С ТЕКСТОМ */
         .floating-text-bg {
             position: absolute;
             top: 0;
@@ -59,59 +59,18 @@
             letter-spacing: 10px;
         }
 
-        .floating-text:nth-child(1) {
-            top: 10%;
-            left: -10%;
-            animation-duration: 25s;
-            opacity: 0.2;
-        }
-
-        .floating-text:nth-child(2) {
-            top: 30%;
-            left: -15%;
-            animation-duration: 30s;
-            animation-delay: -5s;
-            opacity: 0.15;
-            font-size: 150px;
-        }
-
-        .floating-text:nth-child(3) {
-            top: 50%;
-            left: -20%;
-            animation-duration: 35s;
-            animation-delay: -10s;
-            opacity: 0.1;
-            font-size: 180px;
-        }
-
-        .floating-text:nth-child(4) {
-            top: 70%;
-            left: -25%;
-            animation-duration: 40s;
-            animation-delay: -15s;
-            opacity: 0.12;
-            font-size: 200px;
-        }
-
-        .floating-text:nth-child(5) {
-            top: 90%;
-            left: -30%;
-            animation-duration: 45s;
-            animation-delay: -20s;
-            opacity: 0.08;
-            font-size: 220px;
-        }
+        .floating-text:nth-child(1) { top: 10%; left: -10%; animation-duration: 25s; opacity: 0.2; }
+        .floating-text:nth-child(2) { top: 30%; left: -15%; animation-duration: 30s; animation-delay: -5s; opacity: 0.15; font-size: 150px; }
+        .floating-text:nth-child(3) { top: 50%; left: -20%; animation-duration: 35s; animation-delay: -10s; opacity: 0.1; font-size: 180px; }
+        .floating-text:nth-child(4) { top: 70%; left: -25%; animation-duration: 40s; animation-delay: -15s; opacity: 0.12; font-size: 200px; }
+        .floating-text:nth-child(5) { top: 90%; left: -30%; animation-duration: 45s; animation-delay: -20s; opacity: 0.08; font-size: 220px; }
 
         @keyframes floatText {
-            0% {
-                transform: translateX(-10%) rotate(-15deg);
-            }
-            100% {
-                transform: translateX(110%) rotate(-15deg);
-            }
+            0% { transform: translateX(-10%) rotate(-15deg); }
+            100% { transform: translateX(110%) rotate(-15deg); }
         }
 
-        /* ========== ЭКРАН АВТОРИЗАЦИИ ========== */
+        /* ЭКРАН АВТОРИЗАЦИИ */
         #auth-screen {
             height: 100%;
             display: flex;
@@ -130,16 +89,16 @@
             width: 90%;
             max-width: 400px;
             border: 2px solid #8a6fd0;
-            box-shadow: 0 0 50px #8a6fd0, 0 0 100px #4f3780 inset;
+            box-shadow: 0 0 50px #8a6fd0;
             animation: neonPulseAuth 3s infinite;
             position: relative;
             z-index: 2;
         }
 
         @keyframes neonPulseAuth {
-            0% { box-shadow: 0 0 30px #8a6fd0, 0 0 60px #4f3780 inset; }
-            50% { box-shadow: 0 0 60px #b79aff, 0 0 100px #8a6fd0 inset; }
-            100% { box-shadow: 0 0 30px #8a6fd0, 0 0 60px #4f3780 inset; }
+            0% { box-shadow: 0 0 30px #8a6fd0; }
+            50% { box-shadow: 0 0 60px #b79aff; }
+            100% { box-shadow: 0 0 30px #8a6fd0; }
         }
 
         .auth-container h2 {
@@ -147,7 +106,7 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 42px;
-            text-shadow: 0 0 20px #b79aff, 0 0 40px #8a6fd0;
+            text-shadow: 0 0 20px #b79aff;
             letter-spacing: 4px;
         }
 
@@ -182,23 +141,6 @@
             margin: 10px 0;
             cursor: pointer;
             transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: 0.5s;
-        }
-
-        .auth-btn:hover::before {
-            left: 100%;
         }
 
         .auth-btn:hover {
@@ -206,7 +148,7 @@
             box-shadow: 0 0 40px #8a6fd0;
         }
 
-        /* ========== МОДАЛЬНОЕ ОКНО ОШИБКИ ========== */
+        /* МОДАЛЬНОЕ ОКНО ОШИБКИ */
         .error-modal {
             display: none;
             position: fixed;
@@ -235,13 +177,6 @@
             text-align: center;
             max-width: 400px;
             width: 90%;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
         .error-content h3 {
@@ -249,6 +184,12 @@
             font-size: 28px;
             margin-bottom: 20px;
             text-shadow: 0 0 20px #ff6b6b;
+        }
+
+        .error-content p {
+            color: white;
+            font-size: 18px;
+            margin: 20px 0;
         }
 
         .error-btn {
@@ -264,7 +205,7 @@
             box-shadow: 0 0 30px #ff6b6b;
         }
 
-        /* ========== ОСНОВНОЙ ИНТЕРФЕЙС (ТЕЛЕГРАМ СТИЛЬ) ========== */
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
         #main-app {
             display: none;
             height: 100%;
@@ -307,14 +248,14 @@
             box-shadow: 0 0 20px #8a6fd0;
         }
 
-        /* Контейнер с тремя колонками (как в Telegram) */
+        /* Три колонки */
         .telegram-layout {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* Левая колонка - список чатов */
+        /* Левая колонка - чаты */
         .chats-column {
             width: 320px;
             background: rgba(26, 11, 46, 0.8);
@@ -471,14 +412,8 @@
         }
 
         @keyframes messageAppear {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.own {
@@ -677,7 +612,7 @@
 </head>
 <body>
     <div id="app">
-        <!-- АНИМИРОВАННЫЙ ФОН С ТЕКСТОМ -->
+        <!-- АНИМИРОВАННЫЙ ФОН -->
         <div class="floating-text-bg">
             <div class="floating-text">BitTalk</div>
             <div class="floating-text">BitTalk</div>
@@ -690,18 +625,11 @@
         <div id="auth-screen">
             <div class="auth-container">
                 <h2>💜 BitTalk</h2>
-                <input type="text" id="login-input" class="auth-input" placeholder="Логин" value="admin" autocomplete="off">
-                <input type="password" id="password-input" class="auth-input" placeholder="Пароль" value="admin" autocomplete="off">
+                <input type="text" id="login-input" class="auth-input" placeholder="Логин" autocomplete="off">
+                <input type="password" id="password-input" class="auth-input" placeholder="Пароль" autocomplete="off">
                 <div id="auth-error" style="color: #ff6b6b; text-align: center; margin: 10px 0; display: none;"></div>
                 <button id="login-btn" class="auth-btn">🚀 Войти</button>
                 <button id="register-btn" class="auth-btn" style="background: linear-gradient(45deg, #4f3780, #6b4f9f);">✨ Регистрация</button>
-                
-                <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
-                    <p style="color: #b79aff; margin-bottom: 5px;">📋 Тестовые аккаунты:</p>
-                    <p style="color: white;">admin / admin</p>
-                    <p style="color: white;">user / user</p>
-                    <p style="color: white;">test / 123</p>
-                </div>
             </div>
         </div>
 
@@ -709,5 +637,42 @@
         <div class="error-modal" id="error-modal">
             <div class="error-content">
                 <h3>⚠️ ОШИБКА</h3>
-                <p id="error-message" style="color: white; font-size: 18px; margin: 20px 0;"></p>
-                <button class="error-btn" 
+                <p id="error-message"></p>
+                <button class="error-btn" id="close-error">OK</button>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНОЕ ОКНО ПРОФИЛЯ -->
+        <div class="user-profile-modal" id="user-profile-modal">
+            <div class="user-profile-content">
+                <button class="back-btn" id="close-user-profile">←</button>
+                <div style="text-align: center; margin-top: 30px;">
+                    <div class="profile-avatar" style="width: 120px; height: 120px; font-size: 50px; margin-bottom: 20px;" id="modal-user-avatar">👤</div>
+                    <h2 style="color: white; margin-bottom: 10px;" id="modal-user-name"></h2>
+                    <p style="color: #b79aff; margin-bottom: 10px;" id="modal-user-username"></p>
+                    <p style="color: white; margin-bottom: 20px;" id="modal-user-bio"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+        <div id="main-app">
+            <div class="main-header">
+                <div class="header-title">💜 BitTalk</div>
+                <div class="header-avatar" id="current-user-avatar">👤</div>
+            </div>
+
+            <div class="telegram-layout">
+                <!-- Чаты -->
+                <div class="chats-column">
+                    <div class="search-box">
+                        <input type="text" id="search-users" class="search-input" placeholder="🔍 Поиск пользователей...">
+                    </div>
+                    <div class="chats-list" id="chats-list"></div>
+                    <button class="profile-btn" style="margin: 10px; width: calc(100% - 20px);" id="create-group-btn">➕ Создать группу</button>
+                </div>
+
+                <!-- Сообщения -->
+                <div class="messages-column">
+                    <div class="chat-header" id="chat-header" style="display: none;">
+                        <div class="chat-header-avatar" id="chat-header
