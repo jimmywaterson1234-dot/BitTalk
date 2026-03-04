@@ -2,620 +2,396 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitTalk 💜 НЕОНОВЫЙ МЕССЕНДЖЕР</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitTalk 💜 РАБОЧАЯ ВЕРСИЯ</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            font-family: Arial, sans-serif;
         }
-
+        
         body {
-            background: #000000;
+            background: #0a0a0f;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
-
+        
         #app {
             width: 100%;
             height: 100vh;
             max-width: 1400px;
-            background: #0a0a0f;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px #8a2be2, 0 0 100px #4b0082 inset;
+            background: #0f0f1a;
             border: 2px solid #8a2be2;
-            position: relative;
-            overflow: hidden;
         }
-
-        /* НЕОНОВЫЙ АНИМИРОВАННЫЙ ФОН */
-        .neon-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .neon-bg::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 20px,
-                rgba(138, 43, 226, 0.03) 20px,
-                rgba(138, 43, 226, 0.03) 40px
-            );
-            animation: bgMove 20s linear infinite;
-        }
-
-        .neon-bg::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(138,43,226,0.1) 0%, transparent 70%);
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-
-        .floating-text {
-            position: absolute;
-            color: rgba(138, 43, 226, 0.2);
-            font-size: 180px;
-            font-weight: 900;
-            white-space: nowrap;
-            text-transform: uppercase;
-            text-shadow: 0 0 30px #8a2be2, 0 0 60px #4b0082;
-            transform: rotate(-15deg);
-            animation: floatHorizontal 25s linear infinite;
-            z-index: 0;
-            letter-spacing: 15px;
-        }
-
-        .floating-text:nth-child(1) { top: 10%; animation-duration: 20s; font-size: 200px; }
-        .floating-text:nth-child(2) { top: 30%; animation-duration: 25s; animation-delay: -5s; font-size: 250px; opacity: 0.15; }
-        .floating-text:nth-child(3) { top: 50%; animation-duration: 30s; animation-delay: -10s; font-size: 300px; opacity: 0.1; }
-        .floating-text:nth-child(4) { top: 70%; animation-duration: 35s; animation-delay: -15s; font-size: 350px; opacity: 0.08; }
-        .floating-text:nth-child(5) { top: 90%; animation-duration: 40s; animation-delay: -20s; font-size: 400px; opacity: 0.05; }
-
-        @keyframes floatHorizontal {
-            0% { transform: translateX(-100%) rotate(-15deg); }
-            100% { transform: translateX(200%) rotate(-15deg); }
-        }
-
-        @keyframes bgMove {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes pulseGlow {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.3; }
-        }
-
-        /* НЕОНОВЫЙ ЭКРАН ВХОДА */
+        
+        /* ЭКРАН ВХОДА */
         #auth-screen {
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at 50% 50%, #1a0b2e, #000000);
-            position: relative;
-            z-index: 2;
+            background: #1a0b2e;
         }
-
+        
         .auth-box {
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(20px);
-            padding: 50px;
-            border-radius: 40px;
+            background: #2d1b4a;
+            padding: 40px;
+            border-radius: 20px;
             width: 90%;
-            max-width: 450px;
+            max-width: 400px;
             border: 3px solid #8a2be2;
-            box-shadow: 0 0 50px #8a2be2, 0 0 100px #4b0082 inset;
-            animation: neonPulse 2s ease-in-out infinite;
-            position: relative;
-            z-index: 3;
+            box-shadow: 0 0 50px #8a2be2;
         }
-
-        @keyframes neonPulse {
-            0% { box-shadow: 0 0 50px #8a2be2, 0 0 100px #4b0082 inset; }
-            50% { box-shadow: 0 0 80px #b87aff, 0 0 150px #8a2be2 inset; }
-            100% { box-shadow: 0 0 50px #8a2be2, 0 0 100px #4b0082 inset; }
-        }
-
+        
         .auth-box h2 {
             color: white;
             text-align: center;
-            margin-bottom: 40px;
-            font-size: 48px;
-            text-shadow: 0 0 20px #8a2be2, 0 0 40px #b87aff;
-            letter-spacing: 5px;
-            animation: textPulse 2s ease-in-out infinite;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px #8a2be2;
         }
-
-        @keyframes textPulse {
-            0% { text-shadow: 0 0 20px #8a2be2, 0 0 40px #b87aff; }
-            50% { text-shadow: 0 0 40px #b87aff, 0 0 80px #8a2be2; }
-            100% { text-shadow: 0 0 20px #8a2be2, 0 0 40px #b87aff; }
-        }
-
+        
         .auth-box input {
             width: 100%;
-            padding: 18px;
-            margin: 15px 0;
-            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            margin: 10px 0;
+            background: #1a0b2e;
             border: 2px solid #8a2be2;
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
-            font-size: 18px;
-            transition: 0.3s;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+            font-size: 16px;
         }
-
-        .auth-box input:focus {
-            outline: none;
-            border-color: #b87aff;
-            box-shadow: 0 0 40px #8a2be2;
-            transform: scale(1.02);
-        }
-
+        
         .auth-box button {
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(45deg, #8a2be2, #b87aff);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
+            padding: 15px;
             margin: 10px 0;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 30px #8a2be2;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .auth-box button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 60px #b87aff;
-        }
-
-        .auth-box button:active {
-            transform: translateY(0);
-        }
-
-        #register-btn {
-            background: linear-gradient(45deg, #4b0082, #8a2be2);
-        }
-
-        /* НЕОНОВОЕ МОДАЛЬНОЕ ОКНО */
-        .neon-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .neon-modal.show {
-            display: flex;
-            animation: modalAppear 0.3s;
-        }
-
-        @keyframes modalAppear {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-content {
-            background: #1a0b2e;
-            padding: 40px;
-            border-radius: 30px;
-            border: 3px solid #ff4444;
-            box-shadow: 0 0 100px #ff4444, 0 0 200px #ff0000 inset;
-            text-align: center;
-            max-width: 450px;
-            width: 90%;
-        }
-
-        .modal-content h3 {
-            color: #ff4444;
-            font-size: 32px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px #ff4444;
-        }
-
-        .modal-content p {
+            background: #8a2be2;
+            border: none;
+            border-radius: 10px;
             color: white;
-            font-size: 20px;
-            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 30px #8a2be2;
         }
-
-        .modal-content button {
-            background: linear-gradient(45deg, #ff4444, #ff0000);
+        
+        #register-btn {
+            background: #4b0082;
+        }
+        
+        #error-msg {
+            color: #ff4444;
+            text-align: center;
+            margin: 10px 0;
+            display: none;
+            font-weight: bold;
+        }
+        
+        /* ОСНОВНОЙ ЧАТ */
+        #main-app {
+            display: none;
+            height: 100%;
+            background: #0f0f1a;
+            color: white;
+            padding: 20px;
+        }
+        
+        .welcome {
+            background: #2d1b4a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #8a2be2;
+            text-align: center;
+        }
+        
+        .welcome h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px #8a2be2;
+        }
+        
+        .welcome p {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #b87aff;
+        }
+        
+        #logout-btn {
+            background: #ff4444;
             border: none;
             padding: 15px 40px;
             border-radius: 10px;
             color: white;
             font-size: 18px;
             cursor: pointer;
+            margin-top: 20px;
             box-shadow: 0 0 30px #ff4444;
         }
-
-        /* ОСНОВНОЙ ЧАТ - НЕОНОВЫЙ СТИЛЬ */
-        #main-app {
+        
+        /* МОДАЛКА ОШИБКИ */
+        .modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            flex-direction: column;
-            background: #0a0a0f;
-            position: relative;
-            z-index: 2;
-        }
-
-        .header {
-            background: rgba(26, 11, 46, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 15px 25px;
-            display: flex;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
             align-items: center;
-            border-bottom: 3px solid #8a2be2;
-            box-shadow: 0 0 40px #8a2be2;
-            position: relative;
-            z-index: 3;
         }
-
-        .header h1 {
-            color: white;
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #2d1b4a;
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ff4444;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .modal-content h3 {
+            color: #ff4444;
             font-size: 28px;
-            flex: 1;
-            text-shadow: 0 0 15px #8a2be2;
-        }
-
-        .header-avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(45deg, #8a2be2, #b87aff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
-            box-shadow: 0 0 30px #8a2be2;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .chat-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ЛЕВАЯ ПАНЕЛЬ - ЧАТЫ */
-        .sidebar {
-            width: 300px;
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-right: 3px solid #8a2be2;
-            overflow-y: auto;
-            padding: 15px;
-            box-shadow: 0 0 30px #8a2be2 inset;
-        }
-
-        .chat-item {
-            padding: 15px;
-            margin: 8px 0;
-            background: rgba(138, 43, 226, 0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            color: white;
-            border: 1px solid #8a2be2;
-            transition: 0.3s;
-            font-size: 16px;
-            box-shadow: 0 0 15px rgba(138,43,226,0.3);
-        }
-
-        .chat-item:hover {
-            background: rgba(138, 43, 226, 0.4);
-            transform: translateX(5px);
-            box-shadow: 0 0 30px #8a2be2;
-            border-color: #b87aff;
-        }
-
-        /* ЦЕНТРАЛЬНАЯ ПАНЕЛЬ - СООБЩЕНИЯ */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: rgba(10, 10, 15, 0.9);
-        }
-
-        .chat-header {
-            padding: 15px 20px;
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid #8a2be2;
-            display: none;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #8a2be2;
-        }
-
-        .messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .message {
-            margin: 8px 0;
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 70%;
-            animation: messageAppear 0.3s;
-            border: 1px solid rgba(138,43,226,0.5);
-        }
-
-        @keyframes messageAppear {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .my-message {
-            background: linear-gradient(45deg, #8a2be2, #6b1fa0);
-            margin-left: auto;
-            color: white;
-            box-shadow: 0 0 30px #8a2be2;
-            border-bottom-right-radius: 4px;
-        }
-
-        .other-message {
-            background: rgba(26, 11, 46, 0.8);
-            backdrop-filter: blur(5px);
-            color: white;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #8a2be2;
-        }
-
-        .chat-input-area {
-            padding: 20px;
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-top: 3px solid #8a2be2;
-            display: none;
-        }
-
-        .chat-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid #8a2be2;
-            border-radius: 25px;
-            color: white;
-            font-size: 16px;
-            box-shadow: 0 0 20px rgba(138,43,226,0.3);
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #b87aff;
-            box-shadow: 0 0 40px #8a2be2;
-        }
-
-        /* ПРАВАЯ ПАНЕЛЬ - ПРОФИЛЬ */
-        .profile-panel {
-            width: 300px;
-            background: rgba(26, 11, 46, 0.9);
-            backdrop-filter: blur(10px);
-            border-left: 3px solid #8a2be2;
-            padding: 20px;
-            overflow-y: auto;
-            box-shadow: 0 0 30px #8a2be2 inset;
-        }
-
-        .profile-section {
-            background: rgba(138, 43, 226, 0.1);
-            border-radius: 15px;
-            padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid #8a2be2;
-            box-shadow: 0 0 20px rgba(138,43,226,0.2);
         }
-
-        .profile-section h3 {
+        
+        .modal-content p {
             color: white;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px #8a2be2;
+            font-size: 18px;
+            margin: 20px 0;
         }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(45deg, #8a2be2, #b87aff);
-            border-radius: 50%;
-            margin: 10px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 45px;
-            color: white;
-            box-shadow: 0 0 40px #8a2be2;
-            border: 3px solid rgba(255,255,255,0.3);
-        }
-
-        .profile-input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid #8a2be2;
-            border-radius: 8px;
-            color: white;
-            box-shadow: 0 0 15px rgba(138,43,226,0.2);
-        }
-
-        .profile-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #8a2be2, #b87aff);
+        
+        .modal-content button {
+            background: #ff4444;
             border: none;
-            border-radius: 8px;
+            padding: 10px 30px;
+            border-radius: 5px;
             color: white;
-            margin: 5px 0;
+            font-size: 16px;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 20px #8a2be2;
-        }
-
-        #logout-btn {
-            background: linear-gradient(45deg, #ff4444, #ff0000);
-        }
-
-        /* СИГМА ПАНЕЛЬ */
-        .sigma-modal .modal-content {
-            border-color: #ff00ff;
-            box-shadow: 0 0 100px #ff00ff;
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- НЕОНОВЫЙ ФОН -->
-        <div class="neon-bg"></div>
-        <div class="floating-text">BitTalk</div>
-        <div class="floating-text">BitTalk</div>
-        <div class="floating-text">BitTalk</div>
-        <div class="floating-text">BitTalk</div>
-        <div class="floating-text">BitTalk</div>
-
         <!-- ЭКРАН ВХОДА -->
         <div id="auth-screen">
             <div class="auth-box">
                 <h2>💜 BitTalk</h2>
                 <input type="text" id="login" placeholder="Логин" value="admin">
                 <input type="password" id="password" placeholder="Пароль" value="admin">
-                <button id="login-btn" onclick="handleLogin()">🚀 ВОЙТИ</button>
-                <button id="register-btn" onclick="handleRegister()">✨ РЕГИСТРАЦИЯ</button>
+                <div id="error-msg"></div>
+                <button id="login-btn">🚀 ВОЙТИ</button>
+                <button id="register-btn">✨ РЕГИСТРАЦИЯ</button>
+                <div style="color:#b87aff; margin-top:20px; font-size:14px;">
+                    Тестовые: admin/admin, user/user, test/123
+                </div>
             </div>
         </div>
-
-        <!-- МОДАЛКА ОШИБКИ -->
-        <div class="neon-modal" id="error-modal">
-            <div class="modal-content">
-                <h3>⚠️ ОШИБКА</h3>
-                <p id="error-text"></p>
-                <button onclick="closeErrorModal()">OK</button>
-            </div>
-        </div>
-
+        
         <!-- ОСНОВНОЙ ЧАТ -->
         <div id="main-app">
-            <div class="header">
-                <h1>💜 BitTalk</h1>
-                <div class="header-avatar" id="header-avatar">👤</div>
-            </div>
-
-            <div class="chat-layout">
-                <!-- Список чатов -->
-                <div class="sidebar">
-                    <div id="chats-list"></div>
-                    <button class="profile-btn" id="create-group" style="margin-top: 15px;" onclick="createGroup()">➕ СОЗДАТЬ ГРУППУ</button>
-                </div>
-
-                <!-- Область чата -->
-                <div class="chat-area">
-                    <div class="chat-header" id="chat-header">
-                        <span id="current-chat-name"></span>
-                    </div>
-                    <div class="messages" id="messages"></div>
-                    <div class="chat-input-area" id="chat-input-area">
-                        <input type="text" class="chat-input" id="message-input" placeholder="Введите сообщение..." onkeypress="handleMessageKey(event)">
-                    </div>
-                </div>
-
-                <!-- Профиль -->
-                <div class="profile-panel">
-                    <div class="profile-section">
-                        <h3>👤 МОЙ ПРОФИЛЬ</h3>
-                        <div class="profile-avatar" id="profile-avatar">👤</div>
-                        
-                        <input type="text" class="profile-input" id="profile-name" placeholder="Имя">
-                        <input type="text" class="profile-input" id="profile-username" placeholder="Юзернейм">
-                        <input type="text" class="profile-input" id="profile-bio" placeholder="О себе">
-                        
-                        <button class="profile-btn" onclick="saveProfile()">💾 СОХРАНИТЬ</button>
-                    </div>
-
-                    <div class="profile-section">
-                        <h3>⚙️ НАСТРОЙКИ</h3>
-                        <button class="profile-btn" onclick="openSigma()">⚡ СИГМА ПАНЕЛЬ</button>
-                        <button class="profile-btn" id="logout-btn" onclick="logout()">🚪 ВЫЙТИ</button>
-                    </div>
-                </div>
+            <div class="welcome">
+                <h1>💜 ДОБРО ПОЖАЛОВАТЬ!</h1>
+                <p id="welcome-user"></p>
+                <p>✅ Вход выполнен успешно</p>
+                <p>🔥 Полная версия чата скоро будет</p>
+                <button id="logout-btn">🚪 ВЫЙТИ</button>
             </div>
         </div>
-    </div>
-
-    <!-- СИГМА ПАНЕЛЬ -->
-    <div class="neon-modal sigma-modal" id="sigma-modal">
-        <div class="modal-content">
-            <h3 style="color: #ff00ff;">🔐 СИГМА ПАНЕЛЬ</h3>
-            <input type="password" id="sigma-password" class="profile-input" placeholder="ПАРОЛЬ" style="margin:20px 0;">
-            <button class="profile-btn" onclick="checkSigmaPassword()">ВОЙТИ</button>
-            <div id="sigma-users" style="max-height:300px;overflow-y:auto;margin:20px 0;display:none;"></div>
-            <button class="profile-btn" style="background:#ff4444;" onclick="closeSigma()">ЗАКРЫТЬ</button>
-        </div>
-    </div>
-
-    <script>
-        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-        let users = [];
-        let currentUser = null;
-        let messages = { general: [] };
         
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        function init() {
-            console.log("BitTalk инициализация...");
+        <!-- МОДАЛКА ОШИБКИ -->
+        <div class="modal" id="error-modal">
+            <div class="modal-content">
+                <h3>❌ ОШИБКА</h3>
+                <p id="error-text"></p>
+                <button id="close-error">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== ПРОСТЕЙШАЯ РАБОЧАЯ СИСТЕМА ==========
+        
+        // База данных пользователей
+        let users = [
+            { id: '1', login: 'admin', password: 'admin', name: 'Админ' },
+            { id: '2', login: 'user', password: 'user', name: 'Пользователь' },
+            { id: '3', login: 'test', password: '123', name: 'Тест' }
+        ];
+        
+        // Текущий пользователь
+        let currentUser = null;
+        
+        // Сохраняем в localStorage при загрузке
+        if (!localStorage.getItem('bittalk_users')) {
+            localStorage.setItem('bittalk_users', JSON.stringify(users));
+        } else {
+            users = JSON.parse(localStorage.getItem('bittalk_users'));
+        }
+        
+        // Проверяем, есть ли активная сессия
+        const savedUser = localStorage.getItem('bittalk_current');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showMainApp();
+        }
+        
+        // Получаем элементы
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.getElementById('main-app');
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const logoutBtn = document.getElementById('logout-btn');
+        const welcomeUser = document.getElementById('welcome-user');
+        
+        // Модалка ошибки
+        const errorModal = document.getElementById('error-modal');
+        const errorText = document.getElementById('error-text');
+        const closeError = document.getElementById('close-error');
+        
+        // Функция показа ошибки
+        function showError(text) {
+            errorText.textContent = text;
+            errorModal.classList.add('show');
+        }
+        
+        closeError.onclick = function() {
+            errorModal.classList.remove('show');
+        };
+        
+        // Функция входа
+        function doLogin() {
+            console.log("Пытаемся войти...");
             
-            // Загружаем пользователей
-            const savedUsers = localStorage.getItem('bittalk_users');
-            if (savedUsers) {
-                users = JSON.parse(savedUsers);
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!login || !password) {
+                showError('Заполните все поля!');
+                return;
+            }
+            
+            // Ищем пользователя
+            let found = null;
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].login === login && users[i].password === password) {
+                    found = users[i];
+                    break;
+                }
+            }
+            
+            if (found) {
+                console.log("Нашли:", found);
+                currentUser = found;
+                localStorage.setItem('bittalk_current', JSON.stringify(currentUser));
+                showMainApp();
             } else {
-                users = [
-                    { id: '1', login: 'admin', password: 'admin', name: 'Админ', username: '@admin', bio: 'Администратор', avatar: '👨‍💻' },
-                    { id: '2', login: 'user', password: 'user', name: 'Юзер', username: '@user', bio: 'Обычный юзер', avatar: '👤' },
-                    { id: '3', login: 'test', password: '123', name: 'Тест', username: '@test', bio: 'Тестовый', avatar: '🧪' }
-                ];
-               
+                showError('Нет такого пользователя с таким логином и паролем');
+            }
+        }
+        
+        // Функция регистрации
+        function doRegister() {
+            console.log("Пытаемся зарегистрироваться...");
+            
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!login || !password) {
+                showError('Заполните все поля!');
+                return;
+            }
+            
+            if (login.length < 3) {
+                showError('Логин должен быть минимум 3 символа');
+                return;
+            }
+            
+            if (password.length < 3) {
+                showError('Пароль должен быть минимум 3 символа');
+                return;
+            }
+            
+            // Проверяем, нет ли такого
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].login === login) {
+                    showError('Пользователь с таким логином уже есть');
+                    return;
+                }
+            }
+            
+            // Создаем нового
+            const newUser = {
+                id: Date.now().toString(),
+                login: login,
+                password: password,
+                name: login
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('bittalk_users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('bittalk_current', JSON.stringify(currentUser));
+            
+            showMainApp();
+        }
+        
+        // Показать главное приложение
+        function showMainApp() {
+            authScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            welcomeUser.textContent = `👤 ${currentUser.name}`;
+        }
+        
+        // Выход
+        function doLogout() {
+            currentUser = null;
+            localStorage.removeItem('bittalk_current');
+            mainApp.style.display = 'none';
+            authScreen.style.display = 'flex';
+        }
+        
+        // Назначаем обработчики напрямую
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            doLogin();
+        };
+        
+        registerBtn.onclick = function(e) {
+            e.preventDefault();
+            doRegister();
+        };
+        
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            doLogout();
+        };
+        
+        // Enter для отправки
+        loginInput.onkeypress = function(e) {
+            if (e.key === 'Enter') doLogin();
+        };
+        
+        passwordInput.onkeypress = function(e) {
+            if (e.key === 'Enter') doLogin();
+        };
+        
+        console.log("Готово! Версия 1.0");
+    </script>
+</body>
+</html>
