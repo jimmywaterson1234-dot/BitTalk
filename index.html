@@ -112,7 +112,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, get, child, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // ДАННЫЕ ВЗЯТЫ С ТВОЕГО СКРИНШОТА
+        // КЛЮЧИ ИЗ ТВОЕГО СКРИНШОТА
         const firebaseConfig = {
             apiKey: "AIzaSyCaCtnzSZJPJtq04XcM24dw_YVv1Q6o_M",
             authDomain: "bittalk-e6df4.firebaseapp.com",
@@ -134,7 +134,6 @@
 
         const getEmail = (u) => `${u.toLowerCase()}@bittalk.local`;
 
-        // Авторизация
         document.getElementById('toggle-auth-mode').onclick = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-btn').innerText = isLoginMode ? "Войти" : "Создать аккаунт";
@@ -143,6 +142,7 @@
         document.getElementById('auth-btn').onclick = async () => {
             const u = document.getElementById('auth-username').value.trim();
             const p = document.getElementById('auth-password').value.trim();
+            if(!u || !p) return;
             try {
                 if(isLoginMode) {
                     await signInWithEmailAndPassword(auth, getEmail(u), p);
@@ -169,7 +169,6 @@
 
         document.getElementById('btn-logout').onclick = () => signOut(auth);
 
-        // Чат
         window.switchChat = (id) => {
             currentChatId = id;
             if(unsubscribeChat) unsubscribeChat();
@@ -200,3 +199,4 @@
     </script>
 </body>
 </html>
+
