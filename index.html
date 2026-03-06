@@ -19,7 +19,6 @@
         
         body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
 
-        /* Скроллбары */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple-dim); border-radius: 3px; }
@@ -50,65 +49,49 @@
         .chat-header { padding: 15px; background: var(--bg-panel); border-bottom: 1px solid var(--neon-purple); display: flex; justify-content: space-between; align-items: center; }
         .messages-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        /* Сообщения */
         .message { display: flex; gap: 10px; max-width: 75%; }
         .message.self { align-self: flex-end; flex-direction: row-reverse; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--neon-purple); display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 0 5px var(--neon-purple); cursor: pointer; flex-shrink: 0; background-size: cover; background-position: center; }
-        .sidebar-avatar { width: 30px; height: 30px; font-size: 12px; }
         .msg-bubble { background: var(--bg-panel); padding: 10px 15px; border-radius: 10px; border: 1px solid var(--neon-purple-dim); word-wrap: break-word; }
         .message.self .msg-bubble { background: linear-gradient(135deg, var(--bg-panel), var(--neon-purple-dim)); border-color: var(--neon-purple); }
         .msg-author { font-size: 12px; color: var(--neon-purple); margin-bottom: 5px; }
-        .message.self .msg-author { display: none; }
         
         .input-area { padding: 15px; background: var(--bg-panel); border-top: 1px solid var(--neon-purple); display: flex; gap: 10px; }
         .input-area input { flex: 1; margin: 0; }
         .input-area .btn { width: auto; padding: 10px 20px; margin: 0; }
 
-        /* Модалки */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--bg-panel); padding: 20px; border-radius: 10px; width: 300px; border: 1px solid var(--neon-purple); box-shadow: var(--glow); text-align: center; }
-        .modal h2 { margin-bottom: 15px; color: var(--neon-purple); }
-        .close-btn { background: transparent; color: var(--text-muted); border: none; cursor: pointer; margin-top: 10px; width: 100%; padding: 5px; }
-        .close-btn:hover { color: white; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <h1 id="auth-title">BitTalk</h1>
-        <div class="input-group"><input type="text" id="auth-username" placeholder="Юзернейм (только латиница)"></div>
+        <h1>BitTalk</h1>
+        <div class="input-group"><input type="text" id="auth-username" placeholder="Юзернейм"></div>
         <div class="input-group"><input type="password" id="auth-password" placeholder="Пароль"></div>
         <button class="btn" id="auth-btn">Войти</button>
-        <div class="toggle-auth" id="toggle-auth-mode">Нет аккаунта? Зарегистрироваться</div>
+        <div class="toggle-auth" id="toggle-auth-mode">Регистрация</div>
         <div id="auth-error" style="color: #ff4d4d; margin-top: 10px; font-size: 12px;"></div>
     </div>
 
     <div id="app-screen">
         <div class="sidebar">
-            <div class="sidebar-header">
-                <h3>BitTalk</h3>
-                <button class="btn" style="width: auto; padding: 5px 10px;" id="btn-settings">⚙️</button>
-            </div>
+            <div class="sidebar-header"><h3>Чаты</h3><button class="btn" style="width:auto; padding:5px" id="btn-settings">⚙️</button></div>
             <div class="search-box">
-                <input type="text" id="search-user" placeholder="Поиск юзернейма...">
-                <button class="btn" id="btn-search" style="padding: 5px;">Найти пользователя</button>
+                <input type="text" id="search-user" placeholder="Поиск @юзернейм">
+                <button class="btn" id="btn-search">Найти</button>
             </div>
             <div class="chat-list" id="sidebar-chats">
-                <div class="chat-item active" id="chat-global" onclick="switchChat('global')">
-                    <div class="avatar sidebar-avatar">🌐</div>
-                    <div>Общий чат</div>
-                </div>
-                </div>
+                <div class="chat-item active" id="chat-global" onclick="switchChat('global')">🌐 Общий чат</div>
+            </div>
         </div>
         <div class="main-chat">
-            <div class="chat-header">
-                <h3 id="current-chat-title">Общий чат</h3>
-                <button class="btn" style="width: auto; padding: 5px 10px;" id="btn-logout">Выйти</button>
-            </div>
+            <div class="chat-header"><h3 id="current-chat-title">Общий чат</h3><button class="btn" style="width:auto; padding:5px" id="btn-logout">Выход</button></div>
             <div class="messages-area" id="messages-container"></div>
             <div class="input-area">
-                <input type="text" id="msg-input" placeholder="Написать сообщение..." autocomplete="off">
-                <button class="btn" id="btn-send">Отправить</button>
+                <input type="text" id="msg-input" placeholder="Сообщение...">
+                <button class="btn" id="btn-send">➡</button>
             </div>
         </div>
     </div>
@@ -116,22 +99,11 @@
     <div class="modal-overlay" id="settings-modal">
         <div class="modal">
             <h2>Профиль</h2>
-            <div class="input-group"><input type="text" id="set-nickname" placeholder="Отображаемое имя"></div>
-            <div class="input-group"><input type="text" id="set-bio" placeholder="О себе"></div>
-            <div class="input-group"><input type="text" id="set-avatar" placeholder="URL картинки аватара"></div>
+            <input type="text" id="set-nickname" placeholder="Никнейм" class="input-group">
+            <input type="text" id="set-bio" placeholder="О себе" class="input-group">
+            <input type="text" id="set-avatar" placeholder="URL аватара" class="input-group">
             <button class="btn" id="btn-save-settings">Сохранить</button>
-            <button class="close-btn" onclick="document.getElementById('settings-modal').style.display='none'">Закрыть</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="user-info-modal">
-        <div class="modal">
-            <div id="info-avatar" class="avatar" style="width: 80px; height: 80px; margin: 0 auto 15px auto;"></div>
-            <h2 id="info-nickname">Никнейм</h2>
-            <p style="color: var(--neon-purple); margin-bottom: 10px;">@<span id="info-username">username</span></p>
-            <p id="info-bio" style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;"></p>
-            <button class="btn" id="btn-start-pm">Написать сообщение</button>
-            <button class="close-btn" onclick="document.getElementById('user-info-modal').style.display='none'">Закрыть</button>
+            <button class="btn" style="background:gray" onclick="document.getElementById('settings-modal').style.display='none'">Закрыть</button>
         </div>
     </div>
 
@@ -140,236 +112,91 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, get, child, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // === ВСТАВЬ СВОИ ДАННЫЕ FIREBASE СЮДА ===
+        // ДАННЫЕ ВЗЯТЫ С ТВОЕГО СКРИНШОТА
         const firebaseConfig = {
-            apiKey: "ТВОЙ_API",
+            apiKey: "AIzaSyCaCtnzSZJPJtq04XcM24dw_YVv1Q6o_M",
             authDomain: "bittalk-e6df4.firebaseapp.com",
             databaseURL: "https://bittalk-e6df4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "bittalk-e6df4",
             storageBucket: "bittalk-e6df4.appspot.com",
-            messagingSenderId: "ТВОЙ_SENDER",
-            appId: "ТВОЙ_APP_ID"
+            messagingSenderId: "1083926758846",
+            appId: "1:1083926758846:web:51032b148e48556bca25ef"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // State
         let isLoginMode = true;
         let currentUserData = null;
-        let usersCache = {}; 
-        let currentChatId = 'global'; // 'global' или 'uid1_uid2'
-        let currentChatType = 'global'; // 'global' или 'private'
-        let currentCompanionUid = null;
-        let unsubscribeChat = null; // Для отписки от старых чатов
-        let unsubscribeSidebar = null;
+        let currentChatId = 'global';
+        let unsubscribeChat = null;
 
-        // UI
-        const uiAuth = document.getElementById('auth-screen');
-        const uiApp = document.getElementById('app-screen');
-        const errBox = document.getElementById('auth-error');
-        const msgContainer = document.getElementById('messages-container');
-        const msgInput = document.getElementById('msg-input');
+        const getEmail = (u) => `${u.toLowerCase()}@bittalk.local`;
 
-        const getFakeEmail = (username) => `${username.toLowerCase()}@bittalk.local`;
-
-        // === 1. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ===
-        document.getElementById('toggle-auth-mode').addEventListener('click', () => {
+        // Авторизация
+        document.getElementById('toggle-auth-mode').onclick = () => {
             isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "BitTalk Вход" : "BitTalk Регистрация";
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
-            document.getElementById('toggle-auth-mode').innerText = isLoginMode ? "Нет аккаунта? Зарегистрироваться" : "Есть аккаунт? Войти";
-            errBox.innerText = "";
-        });
+            document.getElementById('auth-btn').innerText = isLoginMode ? "Войти" : "Создать аккаунт";
+        };
 
-        document.getElementById('auth-btn').addEventListener('click', async () => {
-            let userStr = document.getElementById('auth-username').value.trim().toLowerCase();
-            const passStr = document.getElementById('auth-password').value.trim();
-            if(!userStr || !passStr) return errBox.innerText = "Заполните все поля";
-
-            const email = getFakeEmail(userStr);
+        document.getElementById('auth-btn').onclick = async () => {
+            const u = document.getElementById('auth-username').value.trim();
+            const p = document.getElementById('auth-password').value.trim();
             try {
                 if(isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, passStr);
+                    await signInWithEmailAndPassword(auth, getEmail(u), p);
                 } else {
-                    // Проверяем, занят ли юзернейм
-                    const userCheck = await get(child(ref(db), `usernames/${userStr}`));
-                    if(userCheck.exists()) throw new Error("Юзернейм занят, выберите другой");
-
-                    const cred = await createUserWithEmailAndPassword(auth, email, passStr);
-                    const uid = cred.user.uid;
-                    
-                    // Сохраняем профиль
-                    await set(ref(db, `users/${uid}`), { username: userStr, nickname: userStr, bio: "", avatarUrl: "" });
-                    // Бронируем юзернейм
-                    await set(ref(db, `usernames/${userStr}`), uid);
+                    const res = await createUserWithEmailAndPassword(auth, getEmail(u), p);
+                    await set(ref(db, `users/${res.user.uid}`), { username: u, nickname: u, bio: "", avatarUrl: "" });
+                    await set(ref(db, `usernames/${u.toLowerCase()}`), res.user.uid);
                 }
-            } catch(error) {
-                errBox.innerText = error.message.includes('auth/') ? "Неверный юзернейм или пароль" : error.message;
-            }
-        });
-
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+            } catch(e) { document.getElementById('auth-error').innerText = e.message; }
+        };
 
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                uiAuth.style.display = 'none';
-                uiApp.style.display = 'flex';
-                const snapshot = await get(child(ref(db), `users/${user.uid}`));
-                if(snapshot.exists()) currentUserData = snapshot.val();
-                
-                loadSidebarChats();
-                window.switchChat('global'); // Стартуем с общего чата
+            if(user) {
+                document.getElementById('auth-screen').style.display='none';
+                document.getElementById('app-screen').style.display='flex';
+                const s = await get(child(ref(db), `users/${user.uid}`));
+                currentUserData = s.val();
+                switchChat('global');
             } else {
-                uiAuth.style.display = 'block';
-                uiApp.style.display = 'none';
-                if(unsubscribeChat) unsubscribeChat();
-                if(unsubscribeSidebar) unsubscribeSidebar();
+                document.getElementById('auth-screen').style.display='block';
+                document.getElementById('app-screen').style.display='none';
             }
         });
 
-        // === 2. ПОИСК ПОЛЬЗОВАТЕЛЕЙ ===
-        document.getElementById('btn-search').addEventListener('click', async () => {
-            const query = document.getElementById('search-user').value.trim().toLowerCase();
-            if(!query) return;
-            
-            if(query === currentUserData.username) return alert("Вы не можете искать сами себя :)");
+        document.getElementById('btn-logout').onclick = () => signOut(auth);
 
-            const snap = await get(child(ref(db), `usernames/${query}`));
-            if(snap.exists()) {
-                const targetUid = snap.val();
-                openPrivateChat(targetUid);
-                document.getElementById('search-user').value = '';
-            } else {
-                alert("Пользователь не найден");
-            }
-        });
-
-        // === 3. УПРАВЛЕНИЕ ЧАТАМИ (ЛОГИКА) ===
-        function getChatId(uid1, uid2) {
-            return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
-        }
-
-        window.switchChat = async function(chatId, type = 'global', companionUid = null) {
-            currentChatId = chatId;
-            currentChatType = type;
-            currentCompanionUid = companionUid;
-
-            // Обновляем UI боковой панели
-            document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-            const activeItem = document.getElementById(chatId === 'global' ? 'chat-global' : `chat-${companionUid}`);
-            if(activeItem) activeItem.classList.add('active');
-
-            // Заголовок
-            if(type === 'global') {
-                document.getElementById('current-chat-title').innerText = "Общий чат";
-            } else {
-                const profile = await getUserProfile(companionUid);
-                document.getElementById('current-chat-title').innerText = `Чат с ${profile.nickname}`;
-            }
-
-            msgContainer.innerHTML = ''; // Чистим экран
-            if(unsubscribeChat) unsubscribeChat(); // Отписываемся от предыдущего чата
-
-            // Подписываемся на новый чат
-            const path = type === 'global' ? 'global_chat' : `private_chats/${chatId}`;
-            unsubscribeChat = onValue(ref(db, path), (snapshot) => {
-                msgContainer.innerHTML = '';
-                snapshot.forEach(child => renderMessage(child.val()));
-                msgContainer.scrollTop = msgContainer.scrollHeight;
+        // Чат
+        window.switchChat = (id) => {
+            currentChatId = id;
+            if(unsubscribeChat) unsubscribeChat();
+            const path = id === 'global' ? 'global_chat' : `private_chats/${id}`;
+            unsubscribeChat = onValue(ref(db, path), (snap) => {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = '';
+                snap.forEach(m => {
+                    const data = m.val();
+                    const div = document.createElement('div');
+                    div.className = `message ${data.uid === auth.currentUser.uid ? 'self' : ''}`;
+                    div.innerHTML = `<div class="msg-bubble">${data.text}</div>`;
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
             });
         };
 
-        window.openPrivateChat = function(targetUid) {
-            document.getElementById('user-info-modal').style.display = 'none';
-            const chatId = getChatId(auth.currentUser.uid, targetUid);
-            
-            // Если чата еще нет в боковой панели, добавляем запись в БД
-            set(ref(db, `user_chats/${auth.currentUser.uid}/${targetUid}`), { companionUid: targetUid });
-            set(ref(db, `user_chats/${targetUid}/${auth.currentUser.uid}`), { companionUid: auth.currentUser.uid });
+        document.getElementById('btn-send').onclick = async () => {
+            const text = document.getElementById('msg-input').value;
+            if(!text) return;
+            const path = currentChatId === 'global' ? 'global_chat' : `private_chats/${currentChatId}`;
+            await push(ref(db, path), { uid: auth.currentUser.uid, text: text, time: serverTimestamp() });
+            document.getElementById('msg-input').value = '';
+        };
 
-            switchChat(chatId, 'private', targetUid);
-        }
-
-        // === 4. БОКОВАЯ ПАНЕЛЬ (СПИСОК ЛС) ===
-        function loadSidebarChats() {
-            if(unsubscribeSidebar) unsubscribeSidebar();
-            
-            unsubscribeSidebar = onValue(ref(db, `user_chats/${auth.currentUser.uid}`), async (snapshot) => {
-                const sidebar = document.getElementById('sidebar-chats');
-                // Оставляем только общий чат
-                sidebar.innerHTML = `<div class="chat-item ${currentChatId==='global'?'active':''}" id="chat-global" onclick="switchChat('global')">
-                                        <div class="avatar sidebar-avatar">🌐</div>
-                                        <div>Общий чат</div>
-                                     </div>`;
-                
-                if(!snapshot.exists()) return;
-
-                const chats = [];
-                snapshot.forEach(child => chats.push(child.val()));
-
-                for(let chat of chats) {
-                    const profile = await getUserProfile(chat.companionUid);
-                    const chatId = getChatId(auth.currentUser.uid, chat.companionUid);
-                    
-                    const div = document.createElement('div');
-                    div.className = `chat-item ${currentChatId === chatId ? 'active' : ''}`;
-                    div.id = `chat-${chat.companionUid}`;
-                    div.onclick = () => switchChat(chatId, 'private', chat.companionUid);
-
-                    const ava = document.createElement('div');
-                    ava.className = 'avatar sidebar-avatar';
-                    if(profile.avatarUrl) ava.style.backgroundImage = `url(${profile.avatarUrl})`;
-                    else ava.innerText = profile.nickname.charAt(0).toUpperCase();
-
-                    const name = document.createElement('div');
-                    name.innerText = profile.nickname;
-
-                    div.appendChild(ava);
-                    div.appendChild(name);
-                    sidebar.appendChild(div);
-                }
-            });
-        }
-
-        // === 5. ОТПРАВКА И ОТОБРАЖЕНИЕ СООБЩЕНИЙ ===
-        async function getUserProfile(uid) {
-            if(!usersCache[uid]) {
-                const snap = await get(child(ref(db), `users/${uid}`));
-                usersCache[uid] = snap.exists() ? snap.val() : { nickname: "Unknown", username: "unknown" };
-            }
-            return usersCache[uid];
-        }
-
-        async function renderMessage(msg) {
-            const isSelf = msg.uid === auth.currentUser.uid;
-            const profile = await getUserProfile(msg.uid);
-            
-            const div = document.createElement('div');
-            div.className = `message ${isSelf ? 'self' : ''}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            if(profile.avatarUrl) avatar.style.backgroundImage = `url(${profile.avatarUrl})`;
-            else avatar.innerText = profile.nickname.charAt(0).toUpperCase();
-            
-            avatar.onclick = () => showUserInfo(profile, msg.uid); // Клик для инфы
-
-            const bubbleWrap = document.createElement('div');
-            const author = document.createElement('div');
-            author.className = 'msg-author';
-            author.innerText = profile.nickname;
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'msg-bubble';
-            bubble.innerText = msg.text;
-
-            bubbleWrap.appendChild(author);
-            bubbleWrap.appendChild(bubble);
-            div.appendChild(avatar);
-            div.appendChild(bubbleWrap);
-            msgContainer.appendChild(div);
-        }
-
-        async fun
+        document.getElementById('btn-settings').onclick = () => document.getElementById('settings-modal').style.display='flex';
+    </script>
+</body>
+</html>
