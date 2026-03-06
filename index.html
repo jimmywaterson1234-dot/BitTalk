@@ -536,12 +536,10 @@
 
     <!-- Firebase & App Logic -->
     <script type="module">
-        // Использование версии 12.10.0 и добавление Analytics как в вашем коде
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child, push, onValue, update, onChildAdded, off } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, push, onValue, update, onChildAdded, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCIbPoQTfEbnv6XM8sZCM8T2u9X3I2LaaU",
@@ -555,7 +553,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getDatabase(app);
         const storage = getStorage(app);
@@ -578,4 +575,393 @@
         // Auth UI
         const authTitle = document.getElementById('auth-title');
         const authError = document.getElementById('auth-error');
-        const inputUsername = document.getElementById(
+        const inputUsername = document.getElementById('auth-username');
+        const inputPassword = document.getElementById('auth-password');
+        const btnLogin = document.getElementById('btn-login');
+        const btnRegisterToggle = document.getElementById('btn-register');
+
+        // Main UI
+        const privateChatsContainer = document.getElementById('private-chats-container');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageInput = document.getElementById('message-input');
+        const btnSendMessage = document.getElementById('btn-send-message');
+        const currentChatName = document.getElementById('current-chat-name');
+        const currentChatAvatar = document.getElementById('current-chat-avatar');
+        const btnGlobalChat = document.getElementById('btn-global-chat');
+        const btnMobileBack = document.getElementById('btn-mobile-back');
+
+        // Modals
+        const settingsModal = document.getElementById('settings-modal');
+        const profileModal = document.getElementById('profile-modal');
+
+        // Helpers
+        const showError = (el, msg) => { el.innerText = msg; el.style.display = 'block'; setTimeout(() => el.style.display='none', 4000); };
+        const getFakeEmail = (username) => `${username.toLowerCase()}@bittalk.local`;
+        const getDefaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a2040&color=b026ff&bold=true`;
+        const formatTime = (ts) => {
+            const d = new Date(ts);
+            return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        };
+        const openModal = (modal) => { modal.style.display = 'flex'; setTimeout(() => { modal.style.opacity = '1'; modal.querySelector('.modal').classList.add('show'); }, 10); };
+        const closeModal = (modal) => { modal.style.opacity = '0'; modal.querySelector('.modal').classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300); };
+
+        // Fetch User Profile with caching
+        const getUserProfile = async (uid) => {
+            if (userCache[uid]) return userCache[uid];
+            const snap = await get(ref(db, `users/${uid}`));
+            if (snap.exists()) {
+                userCache[uid] = snap.val();
+                return userCache[uid];
+            }
+            return { username: 'Unknown', avatar: getDefaultAvatar('U') };
+        };
+
+        // --- AUTH LOGIC ---
+        btnRegisterToggle.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            authTitle.innerText = isLoginMode ? 'Вход' : 'Регистрация';
+            btnLogin.innerText = isLoginMode ? 'Войти' : 'Зарегистрироваться';
+            btnRegisterToggle.innerText = isLoginMode ? 'Нет аккаунта? Регистрация' : 'Уже есть аккаунт? Войти';
+            authError.style.display = 'none';
+        });
+
+        btnLogin.addEventListener('click', async () => {
+            const username = inputUsername.value.trim();
+            const password = inputPassword.value.trim();
+            if(!username || !password) return showError(authError, 'Заполните все поля');
+
+            try {
+                if (!isLoginMode) {
+                    // Registration
+                    const usernameRef = ref(db, `usernames/${username.toLowerCase()}`);
+                    const snap = await get(usernameRef);
+                    if (snap.exists()) throw new Error('Никнейм уже занят');
+
+                    const email = getFakeEmail(username);
+                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                    const uid = userCred.user.uid;
+
+                    const userData = {
+                        uid,
+                        username: username,
+                        usernameLower: username.toLowerCase(),
+                        avatar: getDefaultAvatar(username),
+                        about: 'Привет! Я использую BitTalk.'
+                    };
+
+                    await set(ref(db, `users/${uid}`), userData);
+                    await set(usernameRef, uid);
+                } else {
+                    // Login
+                    const uidSnap = await get(ref(db, `usernames/${username.toLowerCase()}`));
+                    if(!uidSnap.exists()) throw new Error('Пользователь не найден');
+                    await signInWithEmailAndPassword(auth, getFakeEmail(username), password);
+                }
+            } catch (error) {
+                let msg = error.message;
+                if(error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') msg = 'Неверный ник или пароль';
+                else if(error.code === 'auth/weak-password') msg = 'Пароль слишком слабый';
+                showError(authError, msg);
+            }
+        });
+
+        // --- SESSION MANGEMENT ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const snap = await get(ref(db, `users/${user.uid}`));
+                if(snap.exists()) {
+                    currentUserData = snap.val();
+                    userCache[user.uid] = currentUserData;
+                    showApp();
+                } else {
+                    signOut(auth);
+                }
+            } else {
+                currentUser = null;
+                currentUserData = null;
+                showAuth();
+            }
+            setTimeout(() => { loader.style.opacity = '0'; setTimeout(()=>loader.style.display='none', 500); }, 500);
+        });
+
+        const showAuth = () => {
+            appScreen.style.display = 'none';
+            authScreen.style.display = 'block';
+            if(currentMessagesRef) off(currentMessagesRef);
+            off(ref(db, `userChats/${currentUser?.uid || 'none'}`));
+        };
+
+        const showApp = () => {
+            authScreen.style.display = 'none';
+            appScreen.style.display = 'flex';
+            inputUsername.value = ''; inputPassword.value = '';
+            loadPrivateChats();
+            openChat('global');
+        };
+
+        // --- CHAT LOGIC ---
+        const getPrivateChatId = (uid1, uid2) => uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+
+        btnGlobalChat.addEventListener('click', () => openChat('global'));
+
+        const openChat = async (chatId, targetUid = null) => {
+            activeChatId = chatId;
+            messagesContainer.innerHTML = '';
+            
+            // UI updates
+            document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+            if(chatId === 'global') {
+                btnGlobalChat.classList.add('active');
+                currentChatName.innerText = 'Общий чат';
+                currentChatAvatar.src = 'https://ui-avatars.com/api/?name=G&background=b026ff&color=fff';
+            } else {
+                const chatEl = document.getElementById(`chat-${chatId}`);
+                if(chatEl) chatEl.classList.add('active');
+                
+                // Get target user info
+                const targetProfile = await getUserProfile(targetUid);
+                currentChatName.innerText = targetProfile.username;
+                currentChatAvatar.src = targetProfile.avatar;
+            }
+
+            // Mobile view switch
+            if(window.innerWidth <= 768) sidebar.classList.add('hidden');
+
+            // Detach old listener
+            if(currentMessagesRef) off(currentMessagesRef);
+
+            // Attach new listener
+            const path = chatId === 'global' ? 'publicChat' : `privateChats/${chatId}/messages`;
+            currentMessagesRef = ref(db, path);
+            
+            onChildAdded(currentMessagesRef, async (snapshot) => {
+                const msg = snapshot.val();
+                renderMessage(msg);
+            });
+        };
+
+        const renderMessage = async (msg) => {
+            const isMine = msg.uid === currentUser.uid;
+            const profile = await getUserProfile(msg.uid);
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isMine ? 'my-message' : 'other-message'}`;
+            
+            const timeStr = formatTime(msg.timestamp);
+
+            wrapper.innerHTML = `
+                ${!isMine ? `<img src="${profile.avatar}" class="msg-avatar" data-uid="${msg.uid}" alt="Avatar">` : ''}
+                <div class="message">
+                    ${!isMine ? `<div class="msg-author" data-uid="${msg.uid}">${profile.username}</div>` : ''}
+                    <div class="msg-text">${escapeHTML(msg.text)}</div>
+                    <div class="msg-time">${timeStr}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Add profile click events
+            if(!isMine) {
+                const avatarEl = wrapper.querySelector('.msg-avatar');
+                const nameEl = wrapper.querySelector('.msg-author');
+                const openProf = () => showProfileModal(msg.uid);
+                if(avatarEl) avatarEl.addEventListener('click', openProf);
+                if(nameEl) nameEl.addEventListener('click', openProf);
+            }
+        };
+
+        const escapeHTML = (str) => {
+            const div = document.createElement('div');
+            div.innerText = str;
+            return div.innerHTML;
+        };
+
+        const sendMessage = async () => {
+            const text = messageInput.value.trim();
+            if(!text) return;
+
+            messageInput.value = '';
+            const path = activeChatId === 'global' ? 'publicChat' : `privateChats/${activeChatId}/messages`;
+            const msgRef = push(ref(db, path));
+            
+            const message = {
+                uid: currentUser.uid,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            await set(msgRef, message);
+
+            // If private, ensure chat info is saved for both
+            if(activeChatId !== 'global') {
+                const targetUid = activeChatId.replace(currentUser.uid, '').replace('_', '');
+                const updateData = {
+                    [`userChats/${currentUser.uid}/${activeChatId}`]: { targetUid, timestamp: Date.now() },
+                    [`userChats/${targetUid}/${activeChatId}`]: { targetUid: currentUser.uid, timestamp: Date.now() }
+                };
+                update(ref(db), updateData);
+            }
+        };
+
+        btnSendMessage.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+        // Load Private Chats for Sidebar
+        const loadPrivateChats = () => {
+            const chatsRef = ref(db, `userChats/${currentUser.uid}`);
+            onValue(chatsRef, async (snapshot) => {
+                privateChatsContainer.innerHTML = '';
+                if(!snapshot.exists()) {
+                    privateChatsContainer.innerHTML = '<div class="empty-chats">Нет личных чатов</div>';
+                    return;
+                }
+                
+                const chats = [];
+                snapshot.forEach(child => {
+                    chats.push({ id: child.key, ...child.val() });
+                });
+                
+                chats.sort((a,b) => b.timestamp - a.timestamp);
+
+                for(let chat of chats) {
+                    const targetProfile = await getUserProfile(chat.targetUid);
+                    const div = document.createElement('div');
+                    div.className = `chat-item ${activeChatId === chat.id ? 'active' : ''}`;
+                    div.id = `chat-${chat.id}`;
+                    div.innerHTML = `
+                        <img src="${targetProfile.avatar}" class="chat-avatar" alt="A">
+                        <div class="chat-info">
+                            <div class="chat-name">${targetProfile.username}</div>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => openChat(chat.id, chat.targetUid));
+                    privateChatsContainer.appendChild(div);
+                }
+            });
+        };
+
+        // Mobile Sidebar Toggle
+        btnMobileBack.addEventListener('click', () => {
+            sidebar.classList.remove('hidden');
+        });
+
+        // --- PROFILE MODAL ---
+        const showProfileModal = async (uid) => {
+            selectedProfileUid = uid;
+            const profile = await getUserProfile(uid);
+            document.getElementById('profile-modal-avatar').src = profile.avatar;
+            document.getElementById('profile-modal-name').innerText = profile.username;
+            document.getElementById('profile-modal-about').innerText = profile.about || 'Информация отсутствует';
+            
+            const btnWrite = document.getElementById('btn-write-message');
+            if(uid === currentUser.uid) {
+                btnWrite.style.display = 'none';
+            } else {
+                btnWrite.style.display = 'block';
+            }
+            openModal(profileModal);
+        };
+
+        document.getElementById('close-profile').addEventListener('click', () => closeModal(profileModal));
+        
+        document.getElementById('btn-write-message').addEventListener('click', () => {
+            closeModal(profileModal);
+            const chatId = getPrivateChatId(currentUser.uid, selectedProfileUid);
+            openChat(chatId, selectedProfileUid);
+        });
+
+        // --- SETTINGS MODAL ---
+        document.getElementById('btn-open-settings').addEventListener('click', () => {
+            document.getElementById('settings-avatar-preview').src = currentUserData.avatar;
+            document.getElementById('settings-username').value = currentUserData.username;
+            document.getElementById('settings-about').value = currentUserData.about || '';
+            document.getElementById('settings-error').style.display = 'none';
+            openModal(settingsModal);
+        });
+
+        document.getElementById('close-settings').addEventListener('click', () => closeModal(settingsModal));
+        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+        // Avatar Upload
+        const avatarInput = document.getElementById('settings-avatar-input');
+        let newAvatarFile = null;
+
+        document.getElementById('btn-upload-avatar').addEventListener('click', () => avatarInput.click());
+        avatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                newAvatarFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => { document.getElementById('settings-avatar-preview').src = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Save Settings
+        document.getElementById('btn-save-settings').addEventListener('click', async () => {
+            const errEl = document.getElementById('settings-error');
+            const newName = document.getElementById('settings-username').value.trim();
+            const newAbout = document.getElementById('settings-about').value.trim();
+            const btn = document.getElementById('btn-save-settings');
+            
+            if(!newName) return showError(errEl, 'Никнейм не может быть пустым');
+
+            btn.disabled = true;
+            btn.innerText = 'Сохранение...';
+
+            try {
+                let updates = { about: newAbout };
+
+                if(newName.toLowerCase() !== currentUserData.usernameLower) {
+                    const nameRef = ref(db, `usernames/${newName.toLowerCase()}`);
+                    const snap = await get(nameRef);
+                    if(snap.exists()) throw new Error('Этот ник уже занят');
+
+                    try {
+                        await updateEmail(auth.currentUser, getFakeEmail(newName));
+                    } catch(e) {
+                        throw new Error('Для смены ника требуется недавняя авторизация. Выйдите и зайдите снова.');
+                    }
+
+                    const oldNameRef = ref(db, `usernames/${currentUserData.usernameLower}`);
+                    await set(oldNameRef, null); 
+                    await set(nameRef, currentUser.uid); 
+                    
+                    updates.username = newName;
+                    updates.usernameLower = newName.toLowerCase();
+                }
+
+                if(newAvatarFile) {
+                    const sRef = storageRef(storage, `avatars/${currentUser.uid}`);
+                    await uploadBytes(sRef, newAvatarFile);
+                    const url = await getDownloadURL(sRef);
+                    updates.avatar = url;
+                    newAvatarFile = null;
+                }
+
+                await update(ref(db, `users/${currentUser.uid}`), updates);
+                
+                Object.assign(currentUserData, updates);
+                userCache[currentUser.uid] = currentUserData;
+
+                closeModal(settingsModal);
+            } catch (error) {
+                showError(errEl, error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Сохранить';
+            }
+        });
+
+        // Close modals on overlay click
+        [settingsModal, profileModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) closeModal(modal);
+            });
+        });
+
+    </script>
+</body>
+</html>
