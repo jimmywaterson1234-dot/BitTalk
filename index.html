@@ -3,395 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitTalk 💜 РАБОЧАЯ ВЕРСИЯ</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        
-        body {
-            background: #0a0a0f;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #app {
-            width: 100%;
-            height: 100vh;
-            max-width: 1400px;
-            background: #0f0f1a;
-            border: 2px solid #8a2be2;
-        }
-        
-        /* ЭКРАН ВХОДА */
-        #auth-screen {
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #1a0b2e;
-        }
-        
-        .auth-box {
-            background: #2d1b4a;
-            padding: 40px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            border: 3px solid #8a2be2;
-            box-shadow: 0 0 50px #8a2be2;
-        }
-        
-        .auth-box h2 {
-            color: white;
-            text-align: center;
-            font-size: 36px;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px #8a2be2;
-        }
-        
-        .auth-box input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #1a0b2e;
-            border: 2px solid #8a2be2;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-        }
-        
-        .auth-box button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #8a2be2;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 30px #8a2be2;
-        }
-        
-        #register-btn {
-            background: #4b0082;
-        }
-        
-        #error-msg {
-            color: #ff4444;
-            text-align: center;
-            margin: 10px 0;
-            display: none;
-            font-weight: bold;
-        }
-        
-        /* ОСНОВНОЙ ЧАТ */
-        #main-app {
-            display: none;
-            height: 100%;
-            background: #0f0f1a;
-            color: white;
-            padding: 20px;
-        }
-        
-        .welcome {
-            background: #2d1b4a;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #8a2be2;
-            text-align: center;
-        }
-        
-        .welcome h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 30px #8a2be2;
-        }
-        
-        .welcome p {
-            font-size: 24px;
-            margin: 20px 0;
-            color: #b87aff;
-        }
-        
-        #logout-btn {
-            background: #ff4444;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 0 30px #ff4444;
-        }
-        
-        /* МОДАЛКА ОШИБКИ */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: #2d1b4a;
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #ff4444;
-            text-align: center;
-            max-width: 400px;
-        }
-        
-        .modal-content h3 {
-            color: #ff4444;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        
-        .modal-content p {
-            color: white;
-            font-size: 18px;
-            margin: 20px 0;
-        }
-        
-        .modal-content button {
-            background: #ff4444;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+    <title>BitTalk</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <!-- ЭКРАН ВХОДА -->
-        <div id="auth-screen">
-            <div class="auth-box">
-                <h2>💜 BitTalk</h2>
-                <input type="text" id="login" placeholder="Логин" value="admin">
-                <input type="password" id="password" placeholder="Пароль" value="admin">
-                <div id="error-msg"></div>
-                <button id="login-btn">🚀 ВОЙТИ</button>
-                <button id="register-btn">✨ РЕГИСТРАЦИЯ</button>
-                <div style="color:#b87aff; margin-top:20px; font-size:14px;">
-                    Тестовые: admin/admin, user/user, test/123
+    <!-- Экран авторизации -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-box neon-border">
+            <h1 class="neon-text">BitTalk</h1>
+            <p>Вход / Регистрация</p>
+            <input type="text" id="username-input" placeholder="Юзернейм">
+            <input type="password" id="password-input" placeholder="Пароль">
+            <div class="auth-buttons">
+                <button id="login-btn" class="neon-btn">Войти</button>
+                <button id="register-btn" class="neon-btn outline">Регистрация</button>
+            </div>
+            <p id="auth-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <!-- Главный экран -->
+    <div id="app-screen" class="screen">
+        <!-- Боковая панель -->
+        <div class="sidebar neon-border-right">
+            <div class="sidebar-header">
+                <h2 class="neon-text">BitTalk</h2>
+                <button id="settings-btn" class="icon-btn">⚙️</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Поиск пользователя...">
+                <button id="search-btn" class="neon-btn small">Найти</button>
+            </div>
+            <div class="chat-list" id="chat-list">
+                <div class="chat-item active" id="chat-global">
+                    <div class="avatar global-avatar">🌐</div>
+                    <div class="chat-info">
+                        <h4>Общий чат</h4>
+                        <p>Доступен всем</p>
+                    </div>
                 </div>
+                <!-- Здесь будут личные чаты -->
             </div>
         </div>
-        
-        <!-- ОСНОВНОЙ ЧАТ -->
-        <div id="main-app">
-            <div class="welcome">
-                <h1>💜 ДОБРО ПОЖАЛОВАТЬ!</h1>
-                <p id="welcome-user"></p>
-                <p>✅ Вход выполнен успешно</p>
-                <p>🔥 Полная версия чата скоро будет</p>
-                <button id="logout-btn">🚪 ВЫЙТИ</button>
+
+        <!-- Окно чата -->
+        <div class="chat-area">
+            <div class="chat-header neon-border-bottom">
+                <h3 id="current-chat-title">Общий чат</h3>
             </div>
-        </div>
-        
-        <!-- МОДАЛКА ОШИБКИ -->
-        <div class="modal" id="error-modal">
-            <div class="modal-content">
-                <h3>❌ ОШИБКА</h3>
-                <p id="error-text"></p>
-                <button id="close-error">OK</button>
+            <div class="messages" id="messages-container">
+                <!-- Сообщения будут появляться здесь -->
+            </div>
+            <div class="chat-input-area neon-border-top">
+                <input type="text" id="message-input" placeholder="Написать сообщение...">
+                <button id="send-btn" class="neon-btn">Отправить</button>
             </div>
         </div>
     </div>
-    
-    <script>
-        // ========== ПРОСТЕЙШАЯ РАБОЧАЯ СИСТЕМА ==========
-        
-        // База данных пользователей
-        let users = [
-            { id: '1', login: 'admin', password: 'admin', name: 'Админ' },
-            { id: '2', login: 'user', password: 'user', name: 'Пользователь' },
-            { id: '3', login: 'test', password: '123', name: 'Тест' }
-        ];
-        
-        // Текущий пользователь
-        let currentUser = null;
-        
-        // Сохраняем в localStorage при загрузке
-        if (!localStorage.getItem('bittalk_users')) {
-            localStorage.setItem('bittalk_users', JSON.stringify(users));
-        } else {
-            users = JSON.parse(localStorage.getItem('bittalk_users'));
-        }
-        
-        // Проверяем, есть ли активная сессия
-        const savedUser = localStorage.getItem('bittalk_current');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            showMainApp();
-        }
-        
-        // Получаем элементы
-        const authScreen = document.getElementById('auth-screen');
-        const mainApp = document.getElementById('main-app');
-        const loginInput = document.getElementById('login');
-        const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('login-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const errorMsg = document.getElementById('error-msg');
-        const logoutBtn = document.getElementById('logout-btn');
-        const welcomeUser = document.getElementById('welcome-user');
-        
-        // Модалка ошибки
-        const errorModal = document.getElementById('error-modal');
-        const errorText = document.getElementById('error-text');
-        const closeError = document.getElementById('close-error');
-        
-        // Функция показа ошибки
-        function showError(text) {
-            errorText.textContent = text;
-            errorModal.classList.add('show');
-        }
-        
-        closeError.onclick = function() {
-            errorModal.classList.remove('show');
-        };
-        
-        // Функция входа
-        function doLogin() {
-            console.log("Пытаемся войти...");
-            
-            const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            if (!login || !password) {
-                showError('Заполните все поля!');
-                return;
-            }
-            
-            // Ищем пользователя
-            let found = null;
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].login === login && users[i].password === password) {
-                    found = users[i];
-                    break;
-                }
-            }
-            
-            if (found) {
-                console.log("Нашли:", found);
-                currentUser = found;
-                localStorage.setItem('bittalk_current', JSON.stringify(currentUser));
-                showMainApp();
-            } else {
-                showError('Нет такого пользователя с таким логином и паролем');
-            }
-        }
-        
-        // Функция регистрации
-        function doRegister() {
-            console.log("Пытаемся зарегистрироваться...");
-            
-            const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            if (!login || !password) {
-                showError('Заполните все поля!');
-                return;
-            }
-            
-            if (login.length < 3) {
-                showError('Логин должен быть минимум 3 символа');
-                return;
-            }
-            
-            if (password.length < 3) {
-                showError('Пароль должен быть минимум 3 символа');
-                return;
-            }
-            
-            // Проверяем, нет ли такого
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].login === login) {
-                    showError('Пользователь с таким логином уже есть');
-                    return;
-                }
-            }
-            
-            // Создаем нового
-            const newUser = {
-                id: Date.now().toString(),
-                login: login,
-                password: password,
-                name: login
-            };
-            
-            users.push(newUser);
-            localStorage.setItem('bittalk_users', JSON.stringify(users));
-            
-            currentUser = newUser;
-            localStorage.setItem('bittalk_current', JSON.stringify(currentUser));
-            
-            showMainApp();
-        }
-        
-        // Показать главное приложение
-        function showMainApp() {
-            authScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            welcomeUser.textContent = `👤 ${currentUser.name}`;
-        }
-        
-        // Выход
-        function doLogout() {
-            currentUser = null;
-            localStorage.removeItem('bittalk_current');
-            mainApp.style.display = 'none';
-            authScreen.style.display = 'flex';
-        }
-        
-        // Назначаем обработчики напрямую
-        loginBtn.onclick = function(e) {
-            e.preventDefault();
-            doLogin();
-        };
-        
-        registerBtn.onclick = function(e) {
-            e.preventDefault();
-            doRegister();
-        };
-        
-        logoutBtn.onclick = function(e) {
-            e.preventDefault();
-            doLogout();
-        };
-        
-        // Enter для отправки
-        loginInput.onkeypress = function(e) {
-            if (e.key === 'Enter') doLogin();
-        };
-        
-        passwordInput.onkeypress = function(e) {
-            if (e.key === 'Enter') doLogin();
-        };
-        
-        console.log("Готово! Версия 1.0");
-    </script>
+
+    <!-- Модальное окно профиля/настроек (Скрыто по умолчанию) -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content neon-border">
+            <h3 class="neon-text">Настройки профиля</h3>
+            <input type="text" id="profile-nickname" placeholder="Никнейм">
+            <textarea id="profile-bio" placeholder="О себе..."></textarea>
+            <button id="save-profile-btn" class="neon-btn">Сохранить</button>
+            <button id="logout-btn" class="neon-btn outline" style="margin-top: 10px;">Выйти</button>
+            <button id="close-settings" class="close-btn">✖</button>
+        </div>
+    </div>
+
+    <!-- Подключаем логику -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
