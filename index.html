@@ -4,9 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BitTalk</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- ================================== -->
+    <!--  1. СТИЛИ (CSS) ВНУТРИ HTML       -->
+    <!-- ================================== -->
+    <style>
+        :root {
+            --bg-color: #0d001a;
+            --panel-bg: #150029;
+            --neon-purple: #b026ff;
+            --neon-glow: 0 0 10px #b026ff, 0 0 20px #8a00e6;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --msg-bg-me: linear-gradient(135deg, #4d0099, #8a00e6);
+            --msg-bg-other: #1f003b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+
+        .screen { display: none; height: 100vh; width: 100vw; }
+        .screen.active { display: flex; }
+
+        #auth-screen { justify-content: center; align-items: center; }
+        .auth-box { background-color: var(--panel-bg); padding: 40px; border-radius: 15px; text-align: center; width: 350px; }
+        .auth-box input, .modal-content input, .modal-content textarea { width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid var(--neon-purple); color: white; border-radius: 5px; outline: none; }
+        .auth-box input:focus { box-shadow: var(--neon-glow); }
+
+        .neon-border { border: 1px solid var(--neon-purple); box-shadow: var(--neon-glow); }
+        .neon-border-right { border-right: 1px solid var(--neon-purple); box-shadow: 2px 0 10px rgba(176, 38, 255, 0.2); }
+        .neon-border-bottom { border-bottom: 1px solid var(--neon-purple); box-shadow: 0 2px 10px rgba(176, 38, 255, 0.2); }
+        .neon-border-top { border-top: 1px solid var(--neon-purple); box-shadow: 0 -2px 10px rgba(176, 38, 255, 0.2); }
+        .neon-text { color: var(--neon-purple); text-shadow: var(--neon-glow); margin-bottom: 20px; }
+
+        .neon-btn { background: var(--neon-purple); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 0 5px var(--neon-purple); width: 100%; margin-top: 10px; }
+        .neon-btn:hover { box-shadow: var(--neon-glow); }
+        .neon-btn.outline { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); }
+        .neon-btn.outline:hover { background: var(--neon-purple); color: white; }
+        .neon-btn.small { width: auto; padding: 10px; }
+        .auth-buttons { display: flex; gap: 10px; }
+
+        #app-screen { display: none; /* Скрыт по умолчанию */ width: 100%; height: 100%; }
+        #app-screen.active { display: flex; } /* Показывается, когда активен */
+        
+        .sidebar { width: 300px; background-color: var(--panel-bg); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .icon-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+        .search-box { padding: 10px; display: flex; gap: 5px; }
+        .search-box input { flex: 1; padding: 8px; background: #000; border: 1px solid var(--neon-purple); color: white; border-radius: 5px; }
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item { display: flex; align-items: center; padding: 15px; cursor: pointer; border-bottom: 1px solid #2a004f; transition: 0.2s; }
+        .chat-item:hover, .chat-item.active { background-color: #2a004f; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--neon-purple); display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; box-shadow: 0 0 5px var(--neon-purple); }
+
+        .chat-area { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-color); }
+        .chat-header { padding: 20px; background-color: var(--panel-bg); }
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 60%; padding: 12px 15px; border-radius: 15px; position: relative; word-wrap: break-word; }
+        .msg.other { background: var(--msg-bg-other); align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid #3d007a; }
+        .msg.me { background: var(--msg-bg-me); align-self: flex-end; border-bottom-right-radius: 0; box-shadow: 0 0 10px rgba(176, 38, 255, 0.3); }
+        .msg-author { font-size: 12px; color: var(--neon-purple); margin-bottom: 5px; font-weight: bold; }
+
+        .chat-input-area { padding: 15px; display: flex; gap: 10px; background-color: var(--panel-bg); }
+        .chat-input-area input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid var(--neon-purple); background: #000; color: white; outline: none; }
+        .chat-input-area input:focus { box-shadow: var(--neon-glow); }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal.hidden { display: none; }
+        .modal-content { background: var(--panel-bg); padding: 30px; border-radius: 10px; width: 300px; position: relative; }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .error-text { color: #ff3366; margin-top: 10px; font-size: 14px; text-shadow: 0 0 5px #ff3366; height: 1em; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h2, .chat-info, .search-box input { display: none; }
+            .search-box { justify-content: center; }
+            .auth-box { width: 90%; }
+        }
+    </style>
 </head>
 <body>
+    <!-- ================================== -->
+    <!--  2. СТРУКТУРА (HTML)               -->
+    <!-- ================================== -->
     <!-- Экран авторизации -->
     <div id="auth-screen" class="screen active">
         <div class="auth-box neon-border">
@@ -24,15 +105,14 @@
 
     <!-- Главный экран -->
     <div id="app-screen" class="screen">
-        <!-- Боковая панель -->
         <div class="sidebar neon-border-right">
             <div class="sidebar-header">
                 <h2 class="neon-text">BitTalk</h2>
                 <button id="settings-btn" class="icon-btn">⚙️</button>
             </div>
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="Поиск пользователя...">
-                <button id="search-btn" class="neon-btn small">Найти</button>
+                <input type="text" id="search-input" placeholder="Поиск...">
+                <button id="search-btn" class="neon-btn small">🔍</button>
             </div>
             <div class="chat-list" id="chat-list">
                 <div class="chat-item active" id="chat-global">
@@ -42,18 +122,14 @@
                         <p>Доступен всем</p>
                     </div>
                 </div>
-                <!-- Здесь будут личные чаты -->
             </div>
         </div>
 
-        <!-- Окно чата -->
         <div class="chat-area">
             <div class="chat-header neon-border-bottom">
                 <h3 id="current-chat-title">Общий чат</h3>
             </div>
-            <div class="messages" id="messages-container">
-                <!-- Сообщения будут появляться здесь -->
-            </div>
+            <div class="messages" id="messages-container"></div>
             <div class="chat-input-area neon-border-top">
                 <input type="text" id="message-input" placeholder="Написать сообщение...">
                 <button id="send-btn" class="neon-btn">Отправить</button>
@@ -61,7 +137,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно профиля/настроек (Скрыто по умолчанию) -->
+    <!-- Модальное окно профиля/настроек -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content neon-border">
             <h3 class="neon-text">Настройки профиля</h3>
@@ -73,7 +149,163 @@
         </div>
     </div>
 
-    <!-- Подключаем логику -->
-    <script type="module" src="app.js"></script>
+    <!-- ================================== -->
+    <!--  3. ЛОГИКА (JAVASCRIPT) ВНУТРИ HTML -->
+    <!-- ================================== -->
+    <script type="module">
+        // Импортируем нужные модули из Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        //
+        // ❗️❗️❗️ ВАЖНО: ВСТАВЬ СЮДА СВОИ ДАННЫЕ ИЗ FIREBASE КОНСОЛИ! ❗️❗️❗️
+        //
+        const firebaseConfig = {
+            apiKey: "ТВОЙ_API_KEY",
+            authDomain: "bittalk-e6df4.firebaseapp.com",
+            databaseURL: "https://bittalk-e6df4-default-rtdb.firebaseio.com",
+            projectId: "bittalk-e6df4",
+            storageBucket: "bittalk-e6df4.appspot.com",
+            messagingSenderId: "ТВОЙ_SENDER_ID",
+            appId: "ТВОЙ_APP_ID"
+        };
+
+        // --- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ---
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+            console.log("Firebase успешно инициализирован!");
+        } catch (e) {
+            console.error("КРИТИЧЕСКАЯ ОШИБКА: Неверная конфигурация Firebase. Проверь firebaseConfig.", e);
+            document.getElementById('auth-error').innerText = "Ошибка конфигурации Firebase!";
+        }
+
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И DOM-ЭЛЕМЕНТЫ ---
+        let currentUser = null;
+        let userData = {};
+
+        const authScreen = document.getElementById('auth-screen');
+        const appScreen = document.getElementById('app-screen');
+        const errorText = document.getElementById('auth-error');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageInput = document.getElementById('message-input');
+        
+        // --- ЛОГИКА АВТОРИЗАЦИИ ---
+        const getFakeEmail = (username) => `${username.toLowerCase()}@bittalk.app`;
+
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            errorText.innerText = "";
+            const user = document.getElementById('username-input').value.trim();
+            const pass = document.getElementById('password-input').value.trim();
+            if (user.length < 3) return errorText.innerText = "Юзернейм слишком короткий";
+
+            try {
+                const snapshot = await get(ref(db, `usernames/${user.toLowerCase()}`));
+                if (snapshot.exists()) {
+                    return errorText.innerText = "Юзернейм занят, выберите другой";
+                }
+                
+                const userCredential = await createUserWithEmailAndPassword(auth, getFakeEmail(user), pass);
+                const uid = userCredential.user.uid;
+                
+                await set(ref(db, `users/${uid}`), { username: user, nickname: user, bio: "" });
+                await set(ref(db, `usernames/${user.toLowerCase()}`), uid);
+                
+            } catch (error) {
+                console.error("Ошибка регистрации:", error.code, error.message);
+                errorText.innerText = "Ошибка регистрации: " + error.code;
+            }
+        });
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            errorText.innerText = "";
+            const user = document.getElementById('username-input').value.trim();
+            const pass = document.getElementById('password-input').value.trim();
+            if (!user || !pass) return errorText.innerText = "Введите юзернейм и пароль";
+
+            try {
+                await signInWithEmailAndPassword(auth, getFakeEmail(user), pass);
+            } catch (error) {
+                console.error("Ошибка входа:", error.code, error.message);
+                errorText.innerText = "Неверный юзернейм или пароль";
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                authScreen.classList.remove('active');
+                appScreen.classList.add('active');
+
+                onValue(ref(db, `users/${user.uid}`), (snapshot) => { userData = snapshot.val() || {}; });
+                loadGlobalChat();
+            } else {
+                currentUser = null;
+                authScreen.classList.add('active');
+                appScreen.classList.remove('active');
+            }
+        });
+        
+        // --- ЛОГИКА ЧАТА ---
+        function loadGlobalChat() {
+            const chatRef = ref(db, 'global_chat');
+            onValue(chatRef, async (snapshot) => {
+                messagesContainer.innerHTML = '';
+                const messages = snapshot.val();
+                if (!messages) return;
+
+                const usersSnap = await get(ref(db, 'users'));
+                const allUsers = usersSnap.val() || {};
+
+                for (let key in messages) {
+                    const msg = messages[key];
+                    const sender = allUsers[msg.senderId];
+                    const isMe = msg.senderId === currentUser.uid;
+                    
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `msg ${isMe ? 'me' : 'other'}`;
+                    msgDiv.innerHTML = `
+                        ${!isMe ? `<div class="msg-author">${sender?.nickname || 'Unknown'}</div>` : ''}
+                        <div class="msg-text">${msg.text}</div>`;
+                    messagesContainer.appendChild(msgDiv);
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !currentUser) return;
+
+            const chatRef = ref(db, 'global_chat');
+            push(chatRef, { senderId: currentUser.uid, text: text, timestamp: serverTimestamp() });
+            
+            messageInput.value = '';
+        }
+
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        // --- НАСТРОЙКИ, ПРОФИЛЬ, ВЫХОД ---
+        const settingsModal = document.getElementById('settings-modal');
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            document.getElementById('profile-nickname').value = userData.nickname || '';
+            document.getElementById('profile-bio').value = userData.bio || '';
+            settingsModal.classList.remove('hidden');
+        });
+        document.getElementById('close-settings').addEventListener('click', () => settingsModal.classList.add('hidden'));
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+        
+        document.getElementById('save-profile-btn').addEventListener('click', async () => {
+            const newNick = document.getElementById('profile-nickname').value;
+            const newBio = document.getElementById('profile-bio').value;
+            await set(ref(db, `users/${currentUser.uid}/nickname`), newNick);
+            await set(ref(db, `users/${currentUser.uid}/bio`), newBio);
+            settingsModal.classList.add('hidden');
+        });
+    </script>
 </body>
 </html>
